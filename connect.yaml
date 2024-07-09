@@ -25,12 +25,12 @@ deployAs:
           description: The commercetools region
           default: 'europe-west1.gcp'
           required: true
-  - name: notification
+  - name: extension
     applicationType: service
     endpoint: /
     scripts:
-      postDeploy: npm install
+      postDeploy: npm install && npm run setup-resources
     configuration:
       securedConfiguration:
         - key: PAYDOCK_INTEGRATION_CONFIG
-          description: Escaped JSON  object
+          description: Escaped JSON object
