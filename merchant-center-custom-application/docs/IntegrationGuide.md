@@ -1,71 +1,74 @@
-# Paydock Commercetools Custom Application
+# Integration Guide
 
-This guide provides instructions on how to install and set up the "Paydock" custom application for Commercetools.
+**Table of Contents**
 
+- [Create Custom Application in Merchant Center](#create-custom-application-in-merchant-center)
+- [Overview Pages](#overview-pages)
+  - [Live Connection](#live-connection)
+  - [Sandbox Connection](#sandbox-connection)
+  - [Widget Configuration](#widget-configuration)
+  - [Orders](#orders)
+  - [Logs](#logs)
+- [See Also](#see-also)
+- [License](#license)
 
+## Create Custom Application in Merchant Center
 
-## Prerequisites
-Before you begin, ensure you have met the following requirements:
+To create a Custom Application in the Merchant Center, follow these steps:
 
-- [ ] Node.js (version 14 or higher) and npm installed on your machine
-- [ ] Commercetools account with the necessary API credentials
-- [ ] Git installed on your machine
+1. Navigate to the "Register a Custom Application" page.
+2. Register a new application with the following values:
+  - **Name:** For example, "Paydock App".
+  - **entryPointUriPath:** For example, "paydock-app".
+  - Additional fields as required.
 
+Additionally, you will need to add the following pages:
 
-## Installation
+- `/project_key/{entryPointUriPath}/liveconnection` - To set up a live connection (gateway, supported cards, fraud prevention, etc.) to the Paydock system.
+- `/project_key/{entryPointUriPath}/sandboxconnection` - To set up a sandbox connection (gateway, supported cards, fraud prevention, etc.) to the Paydock system.
+- `/project_key/{entryPointUriPath}/widgetconfiguration` - To customize the styles of the widget integrated into Sunrise and other frontend frameworks.
+- `/project_key/{entryPointUriPath}/orders` - To manage orders processed through our payment system, such as changing order statuses.
+- `/project_key/{entryPointUriPath}/logs` - To display and review logs for better transparency and troubleshooting.
 
-Follow these steps to install the custom application:
+![Register a Custom Application](regiser-app.png)
 
-### 1 . Clone the repository
+## Overview Pages
 
-Open your terminal and run the following command to clone the repository:
+### Live Connection
 
-```
-git clone https://github.com/PayDock/e-commerce-commercetools-app
-```
+Set up a live connection (gateway, supported cards, fraud prevention, etc.) to the Paydock system.
 
-Navigate to the project directory:
+![Live Connection](live-configuration.png)
 
-```
-cd e-commerce-commercetools-app
-```
+### Sandbox Connection
 
-### 2 . Install dependencies
+Set up a sandbox connection (gateway, supported cards, fraud prevention, etc.) to the Paydock system.
 
-Run the following command to install the necessary dependencies:
-```
-npm install
-```
+![Sandbox Connection](sandbox-configuration.png)
 
-### 3 . Configuration
+### Widget Configuration
 
-Create a .env file in the root directory of the project and add the following environment variables with your Commercetools API credentials:
-```
-APP_CLIENT_ID=""
-APP_CLIENT_SECRET="***"
-APP_PROJECT_KEY="***"
-APP_REGION="europe-west1.gcp"
-```
-Replace the placeholder values with your actual Commercetools API credentials.
+Customize the styles of the widget integrated into Sunrise and other frontend frameworks.
 
-### 4 . Run the application
-Start the application by running the following command:
-```
-npm start
-```
+![Widget Configuration](style-configuration.png)
 
-The application should now be running on http://your_domain:3000.
+### Orders
 
-## Usage
-To use the custom application:
+Manage orders processed through our payment system, such as changing order statuses.
 
-1. Open your browser and navigate to http://your_domain:3000.
-2. Log in with your Commercetools account credentials.
-3. Follow the on-screen instructions to use the application features.
+![Orders](orders.png)
 
+### Logs
+
+Display and review logs for better transparency and troubleshooting.
+
+![Logs](log.png)
+
+## See Also
+
+- [Paydock Commercetools Widget](https://github.com/PayDock/e-commerce-commercetools-npm)
+- [Paydock Website](https://paydock.com/)
 
 ## License
-This project is licensed under the MIT License. See the [LICENSE](https://rem.mit-license.org/+MIT)  file for details.
 
-## Contact
-If you have any questions or need further assistance, please contact [Professional Services](https://paydock.com/) .
+This repository is available under the [MIT license](LICENSE).
