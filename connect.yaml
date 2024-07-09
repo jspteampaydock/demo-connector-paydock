@@ -22,7 +22,7 @@ deployAs:
           description:  The commercetools project key
           required: true
         - key: APP_REGION
-          description:  The commercetools region
+          description: The commercetools region
           default: 'europe-west1.gcp'
           required: true
         - key: APP_NOTIFICATION_URL
