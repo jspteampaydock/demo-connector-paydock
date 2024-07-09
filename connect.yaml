@@ -33,4 +33,4 @@ deployAs:
     configuration:
       securedConfiguration:
         - key: PAYDOCK_INTEGRATION_CONFIG
-          description: Escaped JSON object
+          description: Escaped JSON  object
