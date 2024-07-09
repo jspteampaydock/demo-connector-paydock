@@ -22,18 +22,18 @@ deployAs:
     configuration:
       standardConfiguration:
         - key: CUSTOM_APPLICATION_ID
-          description: The Custom Application ID
+          description: the Custom Application ID
           required: true
-        - key: APPLICATION_URL
-          description: The Aplication url
-          required: true
-          default: 'http://localhost:3001'
         - key: CLOUD_IDENTIFIER
           description: The cloud identifier
           default: 'gcp-eu'
         - key: ENTRY_POINT_URI_PATH
           description: The Application entry point URI path
           required: true
+        - key: APPLICATION_URL
+          description: The Aplication url
+          required: true
+          default: 'http://localhost:3001'
         - key: APP_CLIENT_ID
           description: The commercetools client Id
           required: true
