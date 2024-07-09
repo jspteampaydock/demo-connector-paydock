@@ -1,6 +1,6 @@
 {
-  "name": "devpaydockapp",
-  "entryPointUriPath": "dev-paydock2-app",
+  "name": "devpaydockapp2",
+  "entryPointUriPath": "${env:ENTRY_POINT_URI_PATH}",
   "cloudIdentifier": "${env:CLOUD_IDENTIFIER}",
   "env": {
     "development": {

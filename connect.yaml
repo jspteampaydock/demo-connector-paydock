@@ -1,28 +1,10 @@
 deployAs:
-  - name: extension
-    applicationType: service
-    endpoint: /
-    scripts:
-      postDeploy: npm install && npm run setup-resources
-    configuration:
-      securedConfiguration:
-        - key: PAYDOCK_INTEGRATION_CONFIG
-          description: Escaped JSON object
-  - name: notification
-    applicationType: service
-    endpoint: /
-    scripts:
-      postDeploy: npm install
-    configuration:
-      securedConfiguration:
-        - key: PAYDOCK_INTEGRATION_CONFIG
-          description: Escaped JSON object
   - name: merchant-center-custom-application
     applicationType: merchant-center-custom-application
     configuration:
       standardConfiguration:
         - key: CUSTOM_APPLICATION_ID
-          description: the Custom Application ID
+          description: The Custom Application ID
           required: true
         - key: CLOUD_IDENTIFIER
           description: The cloud identifier
@@ -30,10 +12,6 @@ deployAs:
         - key: ENTRY_POINT_URI_PATH
           description: The Application entry point URI path
           required: true
-        - key: APPLICATION_URL
-          description: The Aplication url
-          required: true
-          default: 'http://localhost:3001'
         - key: APP_CLIENT_ID
           description: The commercetools client Id
           required: true
@@ -45,7 +23,8 @@ deployAs:
           required: true
         - key: APP_REGION
           description:  The commercetools region
+          default: 'europe-west1.gcp'
           required: true
-        - key: APP_NOTIFICATION_URL
-          description: The notification url
-          required: true
+        - key: NOTIFICATION_URL
+          description:  Notification url
+          required: false

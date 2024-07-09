@@ -1,6 +1,6 @@
 const config = {
-    name: 'devpaydockapp',
-    entryPointUriPath: 'dev-paydock2-app',
+    name: 'devpaydockapp2',
+    entryPointUriPath: '${env:ENTRY_POINT_URI_PATH}',
     cloudIdentifier: '${env:CLOUD_IDENTIFIER}',
     env: {
         development: {
@@ -26,7 +26,7 @@ const config = {
     icon: '${path:@commercetools-frontend/assets/application-icons/rocket.svg}',
     mainMenuLink: {
         defaultLabel: 'Paydock Settings',
-        uriPath: 'dev-paydock-app',
+        uriPath: 'dev-paydock2-app',
         labelAllLocales: [
             { locale: 'en',  value: 'Paydock Settings'},
             { locale: 'de',  value: 'Paydock Settings'}
