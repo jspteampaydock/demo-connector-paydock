@@ -45,7 +45,6 @@ APP_CLIENT_ID=""
 APP_CLIENT_SECRET="***"
 APP_PROJECT_KEY="***"
 APP_REGION="europe-west1.gcp"
-APP_NOTIFICATION_URL="https://notification.....com"
 ```
 Replace the placeholder values with your actual Commercetools API credentials.
 

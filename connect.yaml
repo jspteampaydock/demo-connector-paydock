@@ -25,6 +25,3 @@ deployAs:
           description: The commercetools region
           default: 'europe-west1.gcp'
           required: true
-        - key: APP_NOTIFICATION_URL
-          description:  Notification url
-          required: false

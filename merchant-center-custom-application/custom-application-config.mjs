@@ -1,5 +1,5 @@
 const config = {
-    name: 'devpaydockapp2',
+    name: 'paydock-app',
     entryPointUriPath: '${env:ENTRY_POINT_URI_PATH}',
     cloudIdentifier: '${env:CLOUD_IDENTIFIER}',
     env: {
@@ -16,8 +16,7 @@ const config = {
         clientId: '${env:APP_CLIENT_ID}',
         clientSecret: '${env:APP_CLIENT_SECRET}',
         projectKey: '${env:APP_PROJECT_KEY}',
-        region: '${env:APP_REGION}',
-        notificationUrl: '${env:APP_NOTIFICATION_URL}',
+        region: '${env:APP_REGION}'
     },
     oAuthScopes: {
         view: [],
@@ -26,7 +25,7 @@ const config = {
     icon: '${path:@commercetools-frontend/assets/application-icons/rocket.svg}',
     mainMenuLink: {
         defaultLabel: 'Paydock Settings',
-        uriPath: 'dev-paydock2-app',
+        uriPath: '${env:CLOUD_IDENTIFIER}',
         labelAllLocales: [
             { locale: 'en',  value: 'Paydock Settings'},
             { locale: 'de',  value: 'Paydock Settings'}

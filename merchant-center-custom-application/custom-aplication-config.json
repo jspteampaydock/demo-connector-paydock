@@ -15,8 +15,7 @@
     "clientId": "${env:APP_CLIENT_ID}",
     "clientSecret": "${env:APP_CLIENT_SECRET}",
     "projectKey": "${env:APP_PROJECT_KEY}",
-    "region": "${env:APP_REGION}",
-    "notificationUrl": "${env:APP_NOTIFICATION_URL}"
+    "region": "${env:APP_REGION}"
   },
   "oAuthScopes": {
     "view": [],
@@ -25,7 +24,7 @@
   "icon": "${path:@commercetools-frontend/assets/application-icons/rocket.svg}",
   "mainMenuLink": {
     "defaultLabel": "Paydock Settings",
-    "uriPath": "dev-paydock-app",
+    "uriPath": "${env:CLOUD_IDENTIFIER}",
     "labelAllLocales": [
       {"locale": "en", "value": "Paydock Settings"},
       {"locale": "de", "value": "Paydock Settings"}

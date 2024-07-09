@@ -13,8 +13,9 @@ class PaydockApiAdaptor {
 
   async registerNotifications() {
     const registeredEvents = await this.fetchRegisteredEvents();
+    const notificationUrl = null;
     NOTIFICATIONS.forEach((event) => {
-      if (!registeredEvents.includes(event)) {
+      if (notificationUrl && !registeredEvents.includes(event)) {
         this.callToAPI('v1/notifications', 'POST', {
           destination: this.env.notificationUrl,
           type: 'webhook',
