@@ -1,6 +1,6 @@
 const config = {
     name: 'devpaydockapp',
-    entryPointUriPath: 'dev-paydock-app',
+    entryPointUriPath: 'dev-paydock2-app',
     cloudIdentifier: '${env:CLOUD_IDENTIFIER}',
     env: {
         development: {
