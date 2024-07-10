@@ -8,12 +8,3 @@ deployAs:
       securedConfiguration:
         - key: PAYDOCK_INTEGRATION_CONFIG
           description: Escaped JSON object
-  - name: notification
-    applicationType: service
-    endpoint: /
-    scripts:
-      postDeploy: npm install
-    configuration:
-      securedConfiguration:
-        - key: PAYDOCK_INTEGRATION_CONFIG
-          description: Escaped JSON object
