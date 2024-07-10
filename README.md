@@ -24,7 +24,6 @@ Manages asynchronous notifications from Paydock about payment status changes (e.
 
 ## Additional Resources
 - [Paydock Commercetools Widget](https://github.com/PayDock/e-commerce-commercetools-npm)
-- [Paydock Commercetools Custom Application](https://github.com/PayDock/e-commerce-commercetools-app/)
 - [Official Paydock Website](https://paydock.com/)
 
 ## License
