@@ -11,7 +11,6 @@ const config = {
             url: '${env:APPLICATION_URL}',
         },
     },
-
     additionalEnv: {
         clientId: '${env:APP_CLIENT_ID}',
         clientSecret: '${env:APP_CLIENT_SECRET}',
