@@ -7,7 +7,7 @@ const mainLogger = utils.getLogger()
 async function ensureApiExtensions(
   ctpClient,
   ctpProjectKey,
-  ctpPaydockIntegrationBaseUrl
+  ctpPowerboardIntegrationBaseUrl
 ) {
 
 
@@ -24,13 +24,13 @@ async function ensureApiExtensions(
     })
     const extensionDraft = JSON.parse(
       _.template(JSON.stringify(apiExtensionTemplate))({
-        ctpPaydockIntegrationBaseUrl,
+        ctpPowerboardIntegrationBaseUrl,
       }),
     )
 
     const extensionOrderDraft = JSON.parse(
         _.template(JSON.stringify(apiExtensionOrderTemplate))({
-          ctpPaydockIntegrationBaseUrl,
+          ctpPowerboardIntegrationBaseUrl,
         }),
     )
     const existingExtension = await fetchExtensionByKey(
@@ -42,6 +42,7 @@ async function ensureApiExtensions(
         ctpClient,
         apiExtensionOrderTemplate.key,
     )
+
     if (existingExtensionOrder === null) {
       await ctpClient.create(ctpClient.builder.extensions, extensionOrderDraft)
     }else{
@@ -49,8 +50,8 @@ async function ensureApiExtensions(
       if (actionsExtensionOrder.length > 0) {
         await ctpClient.update(
             ctpClient.builder.extensions,
-            existingExtension.id,
-            existingExtension.version,
+            existingExtensionOrder.id,
+            existingExtensionOrder.version,
             actionsExtensionOrder,
         )
       }
