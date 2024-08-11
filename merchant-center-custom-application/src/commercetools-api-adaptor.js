@@ -228,38 +228,38 @@ class CommerceToolsAPIAdapter {
     let response = {};
     let error = null;
 
+    try {
+      const payment = await this.makeRequest('/payments/' + orderId);
+      if (payment) {
+        const requestData = {
+          version: payment.version,
+          actions: [
+            {
+              action: 'setCustomField',
+              name: 'PaymentExtensionRequest',
+              value: JSON.stringify({
+                action: 'updatePaymentStatus',
+                request: data,
+              }),
+            },
+          ],
+        };
 
-      try {
-        const payment = await this.makeRequest('/payments/' + orderId);
-        if (payment) {
-          const requestData = {
-            version: payment.version,
-            actions: [
-              {
-                action: 'setCustomField',
-                name: 'PaymentExtensionRequest',
-                value: JSON.stringify({
-                  action: 'updatePaymentStatus',
-                  request: data,
-                }),
-              },
-            ],
-          };
-        }
         let updateStatusResponse = await this.makeRequest('/payments/' + orderId, 'POST', requestData);
         let paymentExtensionResponse = updateStatusResponse.custom?.fields?.PaymentExtensionResponse;
         if (!paymentExtensionResponse) {
           error = 'Error update status of payment';
+        } else {
+          paymentExtensionResponse = JSON.parse(paymentExtensionResponse);
+          if (!paymentExtensionResponse.status) {
+            error = paymentExtensionResponse.message;
+          }
         }
-        paymentExtensionResponse = JSON.parse(paymentExtensionResponse);
-        if (!paymentExtensionResponse.status) {
-          error = paymentExtensionResponse.message;
-        }
-      } catch (error) {
-        return { success: false, message: 'Error update status of payment' };
+      } else {
+        error = 'Error fetching payment';
       }
-    } else {
-      error = 'Error fetching payment';
+    } catch (err) {
+      return { success: false, message: 'Error update status of payment' };
     }
 
     if (error) {
