@@ -217,7 +217,6 @@ class CommerceToolsAPIAdapter {
         const orders = await this.makeRequest('/orders?where=' + encodeURIComponent('paymentInfo(payments(id in(' + orderQuery + ')))') + '&sort=createdAt+desc&limit=500');
         await this.collectArrayOrders(orders, paymentsArray, paydockOrders);
       }
-
       return paydockOrders;
     } catch (error) {
       throw error;

@@ -4,13 +4,13 @@ async function setupNotificationResources() {
     const moduleConfig = await config.getModuleConfig()
     const ctpClient = await config.getCtpClient()
     if(moduleConfig.apiNotificationnBaseUrl) {
-        createCustomOjectNotificationUrl(ctpClient, moduleConfig.apiNotificationnBaseUrl)
+        createCustomObjectNotificationUrl(ctpClient, moduleConfig.apiNotificationnBaseUrl)
     }
 }
 
 
 
-async function createCustomOjectNotificationUrl(ctpClient, notificationUrl) {
+async function createCustomObjectNotificationUrl(ctpClient, notificationUrl) {
 
     const objectNotificationUrlDraft = {
             container: "paydock-notification",
