@@ -1,6 +1,6 @@
 {
   "name": "commercetools-paydock-integration-extension",
-  "version": "1.0.0",
+  "version": "0.0.5",
   "description": "Integration between commercetools and Paydock payment service provider",
   "license": "MIT",
   "type": "module",
@@ -28,8 +28,8 @@
     "url": "git+https://github.com/PayDock/e-commerce-commercetools-payment-connector"
   },
   "author": {
-    "name": "commercetools Professional Services",
-    "email": "ps-dev@commercetools.com"
+    "name": "Paydock",
+    "email": "dev@paydock.com"
   },
   "engines": {
     "node": ">=18"
