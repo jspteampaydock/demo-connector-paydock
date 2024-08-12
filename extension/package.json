@@ -7,6 +7,7 @@
   "scripts": {
     "test": "jest --config jest.unit.config.js",
     "start": "node ./src/init.js",
+    "jest-coverage": "jest --coverage --collectCoverageFrom",
     "lint": "eslint --quiet ./src ./test",
     "check": "npm run lint && prettier --check .",
     "doctoc": "doctoc --title '' . --github",

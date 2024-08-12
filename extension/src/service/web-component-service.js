@@ -353,7 +353,7 @@ async function cardFraud3DsInBuildCharge({configurations, input, amount, currenc
     }
 
     const result = await createCharge(request, {directCharge: isDirectCharge});
-    result.paydockStatus = await getPaydockStatusByAPIResponse(isDirectCharge, result.status);
+    result.paydockStatus =  getPaydockStatusByAPIResponse(isDirectCharge, result.status);
     return result;
 }
 
@@ -533,7 +533,7 @@ async function cardFraudInBuild3DsStandaloneCharge({configurations, input, amoun
     }
 
     const result = await createCharge(request, {directCharge: isDirectCharge});
-    result.paydockStatus = await getPaydockStatusByAPIResponse(isDirectCharge, result.status);
+    result.paydockStatus = getPaydockStatusByAPIResponse(isDirectCharge, result.status);
     return result;
 }
 
@@ -557,11 +557,11 @@ async function card3DsCharge({configurations, input, amount, currency, vaultToke
         })
     }
     const isDirectCharge = configurations.card_direct_charge === 'Enable';
-    result.paydockStatus = await getPaydockStatusByAPIResponse(isDirectCharge, result.status);
+    result.paydockStatus = getPaydockStatusByAPIResponse(isDirectCharge, result.status);
     return result;
 }
 
-async function getPaydockStatusByAPIResponse(isDirectCharge, paymentStatus) {
+function getPaydockStatusByAPIResponse(isDirectCharge, paymentStatus) {
     let paydockStatus;
     if (paymentStatus === 'Success') {
         if (isDirectCharge) {
@@ -855,7 +855,7 @@ async function cardCustomerCharge({
         authorization: !isDirectCharge
     }
     const result = await createCharge(request, {directCharge: isDirectCharge});
-    result.paydockStatus = await getPaydockStatusByAPIResponse(isDirectCharge, result.status)
+    result.paydockStatus =  getPaydockStatusByAPIResponse(isDirectCharge, result.status)
     return result;
 }
 
@@ -889,7 +889,7 @@ async function cardCharge({configurations, input, amount, currency, vaultToken})
     }
 
     const result = await createCharge(request, {directCharge: isDirectCharge});
-    result.paydockStatus = await getPaydockStatusByAPIResponse(isDirectCharge, result.status);
+    result.paydockStatus =  getPaydockStatusByAPIResponse(isDirectCharge, result.status);
     return result;
 }
 
@@ -974,7 +974,7 @@ async function apmFlow({configurations, input, amount, currency, paymentSource, 
     }
 
     const result = await createCharge(request, {directCharge: isDirectCharge});
-    result.paydockStatus = await getPaydockStatusByAPIResponse(isDirectCharge, result.status);
+    result.paydockStatus =  getPaydockStatusByAPIResponse(isDirectCharge, result.status);
     return result;
 }
 
@@ -1000,7 +1000,7 @@ async function createCustomer(data) {
     }
 }
 
-async function generateCustomerRequest(input, vaultToken, type, configurations) {
+function generateCustomerRequest(input, vaultToken, type, configurations) {
     const customerRequest = {
         first_name: input.billing_first_name ?? '',
         last_name: input.billing_last_name ?? '',
@@ -1022,7 +1022,7 @@ async function generateCustomerRequest(input, vaultToken, type, configurations) 
 
 async function createCustomerAndSaveVaultToken({configurations, input, vaultToken, type}) {
     let customerId = null;
-    const customerRequest = await generateCustomerRequest(input, vaultToken, type, configurations);
+    const customerRequest = generateCustomerRequest(input, vaultToken, type, configurations);
     const customerResponse = await createCustomer(customerRequest);
     if (customerResponse.status === 'Success' && customerResponse.customerId) {
         customerId = customerResponse.customerId;

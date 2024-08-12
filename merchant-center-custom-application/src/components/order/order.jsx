@@ -4,7 +4,6 @@ import {Pagination} from '@commercetools-uikit/pagination';
 import messages from './messages';
 import styles from './log.module.css';
 import './order.css';
-import axios from 'axios';
 import moment from 'moment';
 import PrimaryButton from '@commercetools-uikit/primary-button';
 import SecondaryButton from '@commercetools-uikit/secondary-button';
@@ -346,11 +345,18 @@ const OrdersHistory = () => {
     const lastRowIndex = page * perPage;
     const firstRowIndex = lastRowIndex - perPage;
 
-    useEffect(async () => {
-        // Виконання запиту до сервера
-        let orders = await apiAdapter.getOrders();
-            setRows(orders);
-        setCurrentRows(rows.slice(firstRowIndex, lastRowIndex));
+    useEffect(() => {
+        const fetchOrders = async () => {
+            try {
+                let orders = await apiAdapter.getOrders();
+                setRows(orders);
+                setCurrentRows(rows.slice(firstRowIndex, lastRowIndex));
+            } catch (error) {
+                setError({ message: `Error: ${error.message}` });
+            }
+        };
+
+        fetchOrders();
     }, []);
 
     useEffect(() => {

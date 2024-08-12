@@ -14,6 +14,7 @@
     "lint": "eslint --quiet ./src ./test",
     "check": "npm run lint && prettier --check .",
     "format": "prettier --write .",
+    "jest-coverage": "jest --coverage --collectCoverageFrom",
     "rename-indexfile": "cp index.googleFunction.js index.js",
     "zip-google-function": "cp index.googleFunction.js index.js && zip -r notification-module.zip src resources .notificationrc index.js package.json && rm index.js",
     "zip-lambda-function": "cp index.lambda.js index.js && npm ci --production && zip -r notification-module.zip . && rm index.js",

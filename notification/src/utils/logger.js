@@ -21,20 +21,6 @@ function getLogger() {
     return obj
 }
 
-async function addPaydockHttpLog(data) {
-    const logKey = `paydock-notification-http_${Date.now()}`;
-
-    const logObject = {
-        container: "paydock-notification-http-logs",
-        key: logKey,
-        value: data
-    };
-    const ctpClient = await config.getCtpClient()
-    ctpClient.create(
-        ctpClient.builder.customObjects,
-        JSON.stringify(logObject)
-    )
-}
 
 async function addPaydockLog(data) {
     const logKey = `paydock-log_${Date.now()}`;
@@ -51,4 +37,4 @@ async function addPaydockLog(data) {
     )
 }
 
-export {getLogger, addPaydockLog, addPaydockHttpLog}
+export {getLogger, addPaydockLog}

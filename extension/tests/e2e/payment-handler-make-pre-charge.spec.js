@@ -1,9 +1,19 @@
 import {expect, test} from '@jest/globals';
 import config from "../../src/config/config.js";
+import loaderConfigResult from "../../test-data/extentionConfig.json";
 
 const creatPaymentRequest = require('../../test-data/paymentHandler/create-payment.json');
 const preChargeRequestData = require('../../test-data/paymentHandler/create-precharge.json');
+jest.mock('../../src/config/config-loader.js', () => {
+    const originalModule = jest.requireActual('../../src/config/config-loader.js');
+    const loaderConfigResult = require('../../test-data/extentionConfig.json')
 
+    return {
+        __esModule: true,
+        ...originalModule,
+        loadConfig: jest.fn(() => loaderConfigResult),
+    };
+});
 describe('E2E::PaymentHandler::makePreCharge::', () => {
     let ctpClient;
     let paymentResponse;

@@ -1,7 +1,17 @@
 import {expect, test} from '@jest/globals';
 import config from '../../src/config/config.js'
 import {setupServer} from "../../src/server.js";
+import loaderConfigResult from "../../test-data/extentionConfig.json";
+jest.mock('../../src/config/config-loader.js', () => {
+    const originalModule = jest.requireActual('../../src/config/config-loader.js');
+    const loaderConfigResult = require('../../test-data/extentionConfig.json')
 
+    return {
+        __esModule: true,
+        ...originalModule,
+        loadConfig: jest.fn(() => loaderConfigResult),
+    };
+});
 const creatPaymentRequest = require('../../test-data/paymentHandler/create-payment.json')
 
 describe('Integration::getPaymentMethods::', () => {

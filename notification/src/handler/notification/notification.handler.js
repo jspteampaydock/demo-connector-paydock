@@ -1,7 +1,7 @@
 import {serializeError} from 'serialize-error'
 import VError from 'verror'
 import config from '../../config/config.js'
-import {addPaydockHttpLog, addPaydockLog} from '../../utils/logger.js'
+import {addPaydockLog} from '../../utils/logger.js'
 import ctp from '../../utils/ctp.js'
 import customObjectsUtils from '../../utils/custom-objects-utils.js'
 
@@ -26,7 +26,6 @@ async function processNotification(
             result.status = 'Failure'
             result.message = 'Payment not found'
         } else if (event !== undefined) {
-            addPaydockHttpLog(notificationResponse)
             switch (event) {
                 case 'transaction_success':
                 case 'transaction_failure':
@@ -62,7 +61,7 @@ async function processNotification(
 
 async function processWebhook(event, payment, notification, ctpClient) {
     const result = {}
-    const {status, paymentStatus, orderStatus} = await getNewStatuses(notification)
+    const {status, paymentStatus, orderStatus} =  getNewStatuses(notification)
     let customStatus = status;
     const chargeId = notification._id
     const currentPayment = payment
@@ -157,7 +156,7 @@ async function processFraudNotification(event, payment, notification, ctpClient)
 
 
 async function processFraudNotificationComplete(event, payment, notification, ctpClient) {
-
+    const result = {}
     const fraudChargeId = notification._id ?? null;
     const cacheName = `paydock_fraud_${notification.reference}`
     let cacheData = await customObjectsUtils.getItem(cacheName)
@@ -166,7 +165,7 @@ async function processFraudNotificationComplete(event, payment, notification, ct
     }
 
     cacheData = JSON.parse(cacheData)
-    const request = await generateChargeRequest(notification, cacheData, fraudChargeId)
+    const request = generateChargeRequest(notification, cacheData, fraudChargeId)
     const isDirectCharge = cacheData.capture
     await customObjectsUtils.removeItem(cacheName)
     const response = await createCharge(request, {directCharge: isDirectCharge}, true)
@@ -210,6 +209,7 @@ function extractChargeIdFromNotification(response) {
 
 async function handleFraudNotification(response, updatedChargeId, ctpClient, payment) {
     let updateActions = [];
+    const result = {}
 
     const currentPayment = payment
     const currentVersion = payment.version
@@ -235,7 +235,7 @@ async function handleFraudNotification(response, updatedChargeId, ctpClient, pay
         {
             action: 'setCustomField',
             name: 'PaydockTransactionId',
-            value: chargeId
+            value: updatedChargeId
         }
     ]
 
@@ -246,7 +246,7 @@ async function handleFraudNotification(response, updatedChargeId, ctpClient, pay
         result.status = 'Success'
 
         await addPaydockLog({
-            paydockChargeID: chargeId,
+            paydockChargeID: updatedChargeId,
             operation,
             status: result.status,
             message: ''
@@ -266,7 +266,7 @@ async function handleFraudNotification(response, updatedChargeId, ctpClient, pay
             {
                 action: 'setCustomField',
                 name: 'PaydockTransactionId',
-                value: chargeId
+                value: updatedChargeId
             },
             {
                 action: 'setCustomField',
@@ -294,7 +294,7 @@ function determineFraudPaymentStatus(isAuthorization, status) {
     };
 }
 
-async function generateChargeRequest(notification, cacheData, fraudChargeId) {
+function generateChargeRequest(notification, cacheData, fraudChargeId) {
     const paymentSource = notification.customer.payment_source
 
     if (cacheData.gateway_id) {
@@ -473,7 +473,10 @@ function calculateRefundedAmount(paydockStatus, oldRefundAmount, refundAmount, o
 }
 
 function calculateOrderAmount(payment){
-    const fraction = payment.amountPlanned.type === 'centPrecision' ? Math.pow(10, payment.amountPlanned.fractionDigits) : 1;
+    let fraction = 1;
+    if (payment?.amountPlanned?.type === 'centPrecision') {
+        fraction = 10 ** payment.amountPlanned.fractionDigits;
+    }
     return payment.amountPlanned.centAmount / fraction;
 }
 
@@ -532,11 +535,11 @@ async function cardFraudAttach({fraudChargeId, chargeId}) {
         fraud_charge_id: fraudChargeId
     }
 
-    return createCharge(request, {action: 'standalone-fraud-attach', chargeId}, true)
+    return await createCharge(request, {action: 'standalone-fraud-attach', chargeId}, true)
 }
 
 
-async function getNewStatuses(notification) {
+function getNewStatuses(notification) {
     let {status} = notification
     status = status ? status.toLowerCase() : 'undefined'
     status = status.charAt(0).toUpperCase() + status.slice(1)

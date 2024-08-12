@@ -58,9 +58,9 @@ class CommerceToolsAPIAdapter {
   }
 
   async makeRequest(endpoint, method = 'GET', body = null) {
-    const accessToken = await this.getAccessToken();
-    const apiUrl = `https://api.${this.region}.commercetools.com/${this.projectKey}${endpoint}`;
     try {
+      const accessToken = await this.getAccessToken();
+      const apiUrl = `https://api.${this.region}.commercetools.com/${this.projectKey}${endpoint}`;
       const response = await fetch(apiUrl, {
         headers: {
           authorization: `Bearer ${accessToken}`,
