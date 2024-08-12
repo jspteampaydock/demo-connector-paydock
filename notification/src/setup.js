@@ -1,6 +1,16 @@
 import {serializeError} from "serialize-error";
 import config from './config/config.js'
 
+
+async function cleanupNotificationResources() {
+    try {
+        const ctpClient = await config.getCtpClient()
+        await ctpClient.deleteByContainerAndKey(ctpClient.builder.customObjects, "paydock-notification", "url")
+    } catch (err) {
+        throw Error(`Error: ${JSON.stringify(serializeError(err))}`)
+    }
+}
+
 async function setupNotificationResources() {
     try {
         const moduleConfig = config.getModuleConfig()
@@ -29,7 +39,8 @@ async function createCustomObjectNotificationUrl(ctpClient, notificationUrl) {
 }
 
 export {
-    setupNotificationResources
+    setupNotificationResources,
+    cleanupNotificationResources
 }
 
 

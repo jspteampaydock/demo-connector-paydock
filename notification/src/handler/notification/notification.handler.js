@@ -384,7 +384,7 @@ async function processRefundSuccessNotification(event, payment, notification, ct
     }
     const result = {}
     let paydockStatus
-    let chargeId = notification._id
+    const chargeId = notification._id
     const currentPayment = payment
     const currentVersion = payment.version
 
@@ -429,6 +429,11 @@ async function processRefundSuccessNotification(event, payment, notification, ct
             },
             {
                 action: 'setCustomField',
+                name: 'PaydockTransactionId',
+                value: chargeId
+            },
+            {
+                action: 'setCustomField',
                 name: 'PaymentExtensionRequest',
                 value: JSON.stringify({
                     action: 'FromNotification',
@@ -436,14 +441,6 @@ async function processRefundSuccessNotification(event, payment, notification, ct
                 })
             }
         ]
-
-        if (chargeId) {
-            updateActions.push({
-                action: 'setCustomField',
-                name: 'PaydockTransactionId',
-                value: chargeId
-            })
-        }
 
         try {
             await ctpClient.update(ctpClient.builder.payments, currentPayment.id, currentVersion, updateActions)
@@ -456,7 +453,6 @@ async function processRefundSuccessNotification(event, payment, notification, ct
             result.message = error
         }
     }
-    chargeId = chargeId ?? currentPayment.custom.fields.PaydockTransactionId
     await addPaydockLog({
         paydockChargeID: chargeId,
         operation: paydockStatus,

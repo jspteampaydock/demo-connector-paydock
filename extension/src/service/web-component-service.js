@@ -6,6 +6,8 @@ import httpUtils from "../utils.js";
 import ctp from "../ctp.js";
 import customObjectsUtils from "../utils/custom-objects-utils.js";
 
+const logger = httpUtils.getLogger();
+
 
 /* Paydock integration */
 
@@ -54,49 +56,7 @@ async function makePayment(makePaymentRequestObj) {
     if (input.CommerceToolsUserId && input.CommerceToolsUserId !== 'not authorized') {
         customerId = await getCustomerIdByVaultToken(input.CommerceToolsUserId, vaultToken);
     }
-
-    if (paymentType === 'bank_accounts' && configurations.bank_accounts_use_on_checkout === 'Yes') {
-        response = await bankAccountFlow({
-            configurations,
-            input,
-            amount,
-            currency,
-            vaultToken,
-            customerId
-        });
-    }
-
-    if (paymentType === 'card' && configurations.card_use_on_checkout === 'Yes') {
-        response = await cardFlow({
-            configurations,
-            input,
-            amount,
-            currency,
-            vaultToken,
-            customerId
-        });
-    }
-
-    if (['Zippay', 'Afterpay v1'].includes(paymentType)) {
-        response = await apmFlow({
-            configurations,
-            input,
-            amount,
-            currency,
-            paymentSource,
-            paymentType
-        });
-    }
-
-    if (['PayPal Smart', 'Google Pay', 'Apple Pay', 'Afterpay v2'].includes(paymentType)) {
-        paydockStatus = input.PaydockPaymentStatus;
-        response = {
-            status: 'Success',
-            message: 'Create Charge',
-            paydockStatus,
-            chargeId: input.charge_id
-        }
-    }
+    response = await handlePaymentType(input, configurations, vaultToken, customerId, amount, currency, paymentType);
 
     if (response) {
         status = response.status;
@@ -114,6 +74,55 @@ async function makePayment(makePaymentRequestObj) {
     })
 
     return response;
+}
+
+async function handlePaymentType(input, configurations, vaultToken, customerId, amount, currency, paymentType) {
+    try {
+        switch (paymentType) {
+            case 'card':
+                if (configurations.card_use_on_checkout === 'Yes') {
+                    return await cardFlow({
+                        configurations,
+                        input,
+                        amount,
+                        currency,
+                        vaultToken,
+                        customerId
+                    });
+                }
+                break;
+            case 'Zippay':
+            case 'Afterpay v1':
+                return await apmFlow({
+                    configurations,
+                    input,
+                    amount,
+                    currency,
+                    paymentType
+                });
+            case 'PayPal Smart':
+            case 'Google Pay':
+            case 'Apple Pay':
+            case 'Afterpay v2':
+                return {
+                    status: 'Success',
+                    message: 'Create Charge',
+                    paydockStatus: input.PaydockPaymentStatus,
+                    chargeId: input.charge_id,
+                };
+            default:
+                // Default case to handle unexpected or unknown payment types
+                return {
+                    status: 'Error',
+                    message: `Unknown payment type: ${paymentType}`,
+                    paydockStatus: input.PaydockPaymentStatus,
+                };
+        }
+        return null;
+    } catch (error) {
+        logger.error(`Error in handlePaymentType: ${JSON.stringify(serializeError(error))}`);
+        throw error;
+    }
 }
 
 async function getVaultToken(getVaultTokenRequestObj) {
@@ -353,7 +362,7 @@ async function cardFraud3DsInBuildCharge({configurations, input, amount, currenc
     }
 
     const result = await createCharge(request, {directCharge: isDirectCharge});
-    result.paydockStatus =  getPaydockStatusByAPIResponse(isDirectCharge, result.status);
+    result.paydockStatus = getPaydockStatusByAPIResponse(isDirectCharge, result.status);
     return result;
 }
 
@@ -690,25 +699,33 @@ async function cardFraudCharge({
 }
 
 async function cardFraudInBuildCharge({configurations, input, amount, currency, vaultToken}) {
+    const isDirectCharge = configurations.card_direct_charge === 'Enable';
+    const request = buildRequestcardFraudInBuildCharge(input, configurations, vaultToken, amount, currency)
+    const result = await createCharge(request, {directCharge: isDirectCharge});
+    if (result.status === 'Success') {
+        result.paydockStatus = c.STATUS_TYPES.PENDING;
+    } else {
+        result.paydockStatus = c.STATUS_TYPES.FAILED;
+    }
+
+    return result;
+}
+
+function buildRequestcardFraudInBuildCharge(input, configurations, vaultToken, amount, currency) {
     const payment_source = getAdditionalFields(input);
     payment_source.vault_token = vaultToken;
-
     if (configurations.card_gateway_id) {
         payment_source.gateway_id = configurations.card_gateway_id;
     }
-
     if (input.cvv) {
         payment_source.card_ccv = input.cvv;
     }
-
     const isDirectCharge = configurations.card_direct_charge === 'Enable';
-
     const billingFirstName = input.billing_first_name ?? '';
     const billingLastName = input.billing_last_name ?? '';
     const billingEmail = input.billing_email ?? '';
     const billingPhone = input.billing_phone ?? '';
-
-    const request = {
+    return {
         amount,
         reference: input.orderId ?? '',
         currency,
@@ -742,17 +759,8 @@ async function cardFraudInBuildCharge({configurations, input, amount, currency, 
         capture: isDirectCharge,
         authorization: !isDirectCharge
     }
-
-
-    const result = await createCharge(request, {directCharge: isDirectCharge});
-    if (result.status === 'Success') {
-        result.paydockStatus = c.STATUS_TYPES.PENDING;
-    } else {
-        result.paydockStatus = c.STATUS_TYPES.FAILED;
-    }
-
-    return result;
 }
+
 
 async function cardFraudStandaloneCharge({configurations, input, amount, currency, vaultToken}) {
     const cacheData = {
@@ -855,7 +863,7 @@ async function cardCustomerCharge({
         authorization: !isDirectCharge
     }
     const result = await createCharge(request, {directCharge: isDirectCharge});
-    result.paydockStatus =  getPaydockStatusByAPIResponse(isDirectCharge, result.status)
+    result.paydockStatus = getPaydockStatusByAPIResponse(isDirectCharge, result.status)
     return result;
 }
 
@@ -889,43 +897,7 @@ async function cardCharge({configurations, input, amount, currency, vaultToken})
     }
 
     const result = await createCharge(request, {directCharge: isDirectCharge});
-    result.paydockStatus =  getPaydockStatusByAPIResponse(isDirectCharge, result.status);
-    return result;
-}
-
-async function bankAccountFlow({configurations, input, amount, currency, vaultToken, customerId}) {
-    let result;
-    if (
-        configurations.bank_accounts_bank_account_save === 'Enable' &&
-        input.SaveCard &&
-        (
-            configurations.bank_accounts_bank_method_save === 'Customer with Gateway ID' ||
-            configurations.bank_accounts_bank_method_save === 'Customer without Gateway ID'
-        )
-    ) {
-        result = await bankAccountChargeWithCustomerId({
-            configurations,
-            input,
-            amount,
-            currency,
-            vaultToken,
-            customerId
-        });
-
-        result.paydockStatus = result.status === 'Success' ? 'paydock-received' : 'paydock-failed';
-    } else {
-        result = await bankAccountDirectCharge({
-            configurations,
-            input,
-            customerId,
-            vaultToken,
-            amount,
-            currency
-        });
-
-        result.paydockStatus = result.status === 'Success' ? 'paydock-requested' : 'paydock-failed';
-    }
-
+    result.paydockStatus = getPaydockStatusByAPIResponse(isDirectCharge, result.status);
     return result;
 }
 
@@ -974,7 +946,7 @@ async function apmFlow({configurations, input, amount, currency, paymentSource, 
     }
 
     const result = await createCharge(request, {directCharge: isDirectCharge});
-    result.paydockStatus =  getPaydockStatusByAPIResponse(isDirectCharge, result.status);
+    result.paydockStatus = getPaydockStatusByAPIResponse(isDirectCharge, result.status);
     return result;
 }
 
@@ -1014,9 +986,6 @@ function generateCustomerRequest(input, vaultToken, type, configurations) {
     if (type === 'card' && configurations.card_card_method_save === 'Customer with Gateway ID' && configurations.card_gateway_id) {
         customerRequest.payment_source.gateway_id = configurations.card_gateway_id;
     }
-    if (type === 'bank_accounts' && configurations.bank_accounts_bank_method_save === 'Customer with Gateway ID' && configurations.bank_accounts_gateway_id) {
-        customerRequest.payment_source.gateway_id = configurations.bank_accounts_gateway_id;
-    }
     return customerRequest;
 }
 
@@ -1039,10 +1008,6 @@ async function createCustomerAndSaveVaultToken({configurations, input, vaultToke
             (
                 (
                     type === 'card' && ['Customer with Gateway ID', 'Customer without Gateway ID'].includes(configurations.card_card_method_save)
-                )
-                ||
-                (
-                    type === 'bank_accounts' && ['Customer with Gateway ID', 'Customer without Gateway ID'].includes(configurations.bank_accounts_bank_method_save)
                 )
             )
         ) {
@@ -1088,9 +1053,6 @@ function shouldSaveVaultToken({type, saveCard, userId, configurations}) {
     if (type === 'card') {
         shouldSaveCard = shouldSaveCard && (configurations.card_card_save === 'Enable');
     }
-    if (type === 'bank_accounts') {
-        shouldSaveCard = shouldSaveCard && (configurations.bank_accounts_bank_account_save === 'Enable');
-    }
 
     return userId && (userId !== 'not authorized') && shouldSaveCard;
 }
@@ -1100,7 +1062,7 @@ async function saveUserToken({token, user_id, customer_id}) {
 
     const title = getVaultTokenTitle(token);
 
-    const type = token.type === 'card' ? 'card' : 'bank_accounts';
+    const type = 'card';
 
     return await insertOrUpdateUserVaultToken({
         unique_key,
@@ -1124,9 +1086,6 @@ function getVaultTokenTitle(tokenData) {
             }
             const card_scheme = tokenData.card_scheme.charAt(0).toUpperCase() + tokenData.card_scheme.slice(1);
             title = `${card_scheme} ${tokenData.card_number_last4} ${expire_month}/${tokenData.expire_year}`
-        }
-        if (tokenData.type === 'bank_account') {
-            title = `${tokenData.account_name} ${tokenData.account_number}`;
         }
     }
 
@@ -1210,55 +1169,6 @@ async function getCustomerIdByVaultToken(user_id, vault_token) {
     } catch (error) {
         return customerId;
     }
-}
-
-async function bankAccountChargeWithCustomerId({
-                                                   configurations,
-                                                   input,
-                                                   amount,
-                                                   currency,
-                                                   vaultToken,
-                                                   customerId
-                                               }) {
-    if (!customerId) {
-        customerId = await createCustomerAndSaveVaultToken({
-            configurations,
-            input,
-            vaultToken,
-            type: 'bank_accounts'
-        });
-    }
-
-    return await bankAccountDirectCharge({configurations, input, customerId, vaultToken, amount, currency});
-}
-
-async function bankAccountDirectCharge({configurations, input, customerId, vaultToken, amount, currency}) {
-    const payment_source = getAdditionalFields(input);
-    payment_source.vault_token = vaultToken;
-    payment_source.type = 'bank_account';
-
-    if (configurations.bank_accounts_gateway_id) {
-        payment_source.gateway_id = configurations.bank_accounts_gateway_id;
-    }
-
-    const data = {
-        reference: input.orderId ?? '',
-        amount,
-        currency,
-        customer: {
-            first_name: input.billing_first_name ?? '',
-            last_name: input.billing_last_name ?? '',
-            email: input.billing_email ?? '',
-            phone: input.billing_phone ?? '',
-            payment_source
-        }
-    };
-
-    if (customerId) {
-        data.customer_id = customerId;
-    }
-
-    return await createCharge(data);
 }
 
 async function createCharge(data, params = {}, returnObject = false) {

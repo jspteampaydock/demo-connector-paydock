@@ -29,7 +29,8 @@ deployAs:
     applicationType: service
     endpoint: /
     scripts:
-      postDeploy: npm install && npm run setup-resources
+      postDeploy: npm install && npm run extension:post-deploy
+      preUndeploy: npm install && npm run extension:pre-undeploy
     configuration:
       securedConfiguration:
         - key: PAYDOCK_INTEGRATION_CONFIG
@@ -38,7 +39,8 @@ deployAs:
     applicationType: service
     endpoint: /
     scripts:
-      postDeploy: npm install && npm run setup-resources
+      postDeploy: npm install && npm run notification:post-deploy
+      preUndeploy: npm install && npm run notification:pre-undeploy
     configuration:
       securedConfiguration:
         - key: PAYDOCK_INTEGRATION_CONFIG
