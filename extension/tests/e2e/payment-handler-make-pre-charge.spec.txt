@@ -1,6 +1,5 @@
 import {expect, test} from '@jest/globals';
 import config from "../../src/config/config.js";
-import loaderConfigResult from "../../test-data/extentionConfig.json";
 
 const creatPaymentRequest = require('../../test-data/paymentHandler/create-payment.json');
 const preChargeRequestData = require('../../test-data/paymentHandler/create-precharge.json');
@@ -24,7 +23,7 @@ describe('E2E::PaymentHandler::makePreCharge::', () => {
         ctpClient = await config.getCtpClient();
         configPayments = await config.getPaydockConfig();
         paymentResponse = await ctpClient.create(ctpClient.builder.payments, creatPaymentRequest)
-
+console.log(paymentResponse);
         configPayments = configPayments.hasOwnProperty('sandbox')
             ? configPayments.sandbox
             : configPayments.live;

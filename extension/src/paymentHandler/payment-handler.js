@@ -10,11 +10,10 @@ import c from "../config/constants.js";
 import {
     deleteCustomFieldAction
 } from './payment-utils.js'
-import {isBasicAuthEnabled} from '../validator/authentication.js'
 import errorMessages from '../validator/error-messages.js'
 
 async function handlePayment(paymentObject, authToken) {
-    if (isBasicAuthEnabled() && !authToken) {
+    if (!authToken) {
         return {
             errors: [
                 {
@@ -131,19 +130,13 @@ function _getPaymentHandlers(paymentObject) {
 
 function _validatePaymentRequest(paymentObject, authToken) {
     const paymentValidator = withPayment(paymentObject)
-    if (!isBasicAuthEnabled()) {
-        paymentValidator
-            .validateMetadataFields()
-        if (paymentValidator.hasErrors()) return paymentValidator.getErrors()
-    } else {
-        paymentValidator.validateMetadataFields()
-        if (paymentValidator.hasErrors()) return paymentValidator.getErrors()
+    paymentValidator.validateMetadataFields()
+    if (paymentValidator.hasErrors()) return paymentValidator.getErrors()
 
-        paymentValidator.validateAuthorizationHeader(authToken)
-        if (paymentValidator.hasErrors()) return paymentValidator.getErrors()
+    paymentValidator.validateAuthorizationHeader(authToken)
+    if (paymentValidator.hasErrors()) return paymentValidator.getErrors()
 
-        if (paymentValidator.hasErrors()) return paymentValidator.getErrors()
-    }
+    if (paymentValidator.hasErrors()) return paymentValidator.getErrors()
     return null
 }
 
