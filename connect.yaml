@@ -33,8 +33,31 @@ deployAs:
       preUndeploy: npm install && npm run extension:pre-undeploy
     configuration:
       securedConfiguration:
-        - key: PAYDOCK_INTEGRATION_CONFIG
-          description: Escaped JSON object
+        - key: COMMERCETOOLS_CLIENT_ID
+          description: The commercetools client Id
+          required: true
+        - key: COMMERCETOOLS_CLIENT_SECRET
+          description:  The commercetools client secret
+          required: true
+        - key: COMMERCETOOLS_PROJECT_KEY
+          description:  The commercetools project key
+          required: true
+      standardConfiguration:
+        - key: COMMERCETOOLS_API_URL
+          description: The commercetolos api url
+          default: https://api.europe-west1.gcp.commercetools.com
+          required: true
+        - key: COMMERCETOOLS_AUTH_URL
+          description: The commercetolos auth url
+          default: https://auth.europe-west1.gcp.commercetools.com
+        - key: ENTRY_POINT_URI_PATH
+          description: The Application entry point URI path
+        - key: PAYDOCK_LIVE_URL
+          description: Paydock live url
+        - key: PAYDOCK_SANDBOX_URL
+          description: Paydock sandbox url
+        - key: NOTIFICATION_BASE_URL
+          description: The notification URI path
   - name: notification
     applicationType: service
     endpoint: /
@@ -43,5 +66,28 @@ deployAs:
       preUndeploy: npm install && npm run notification:pre-undeploy
     configuration:
       securedConfiguration:
-        - key: PAYDOCK_INTEGRATION_CONFIG
-          description: Escaped JSON object
+        - key: COMMERCETOOLS_CLIENT_ID
+          description: The commercetools client Id
+          required: true
+        - key: COMMERCETOOLS_CLIENT_SECRET
+          description:  The commercetools client secret
+          required: true
+        - key: COMMERCETOOLS_PROJECT_KEY
+          description:  The commercetools project key
+          required: true
+      standardConfiguration:
+        - key: COMMERCETOOLS_API_URL
+          description: The commercetolos api url
+          default: https://api.europe-west1.gcp.commercetools.com
+          required: true
+        - key: COMMERCETOOLS_AUTH_URL
+          description: The commercetolos auth url
+          default: https://auth.europe-west1.gcp.commercetools.com
+        - key: ENTRY_POINT_URI_PATH
+          description: The Application entry point URI path
+        - key: PAYDOCK_LIVE_URL
+          description: Paydock live url
+        - key: PAYDOCK_SANDBOX_URL
+          description: Paydock sandbox url
+        - key: EXTENSION_BASE_URL
+          description: The extension URI path
