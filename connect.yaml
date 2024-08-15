@@ -39,10 +39,10 @@ deployAs:
         - key: COMMERCETOOLS_CLIENT_SECRET
           description:  The commercetools client secret
           required: true
+      standardConfiguration:
         - key: COMMERCETOOLS_PROJECT_KEY
           description:  The commercetools project key
           required: true
-      standardConfiguration:
         - key: COMMERCETOOLS_API_URL
           description: The commercetolos api url
           default: https://api.europe-west1.gcp.commercetools.com
@@ -71,10 +71,10 @@ deployAs:
         - key: COMMERCETOOLS_CLIENT_SECRET
           description:  The commercetools client secret
           required: true
+      standardConfiguration:
         - key: COMMERCETOOLS_PROJECT_KEY
           description:  The commercetools project key
           required: true
-      standardConfiguration:
         - key: COMMERCETOOLS_API_URL
           description: The commercetolos api url
           default: https://api.europe-west1.gcp.commercetools.com
