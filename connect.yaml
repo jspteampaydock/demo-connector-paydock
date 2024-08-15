@@ -82,9 +82,9 @@ deployAs:
         - key: COMMERCETOOLS_AUTH_URL
           description: The commercetolos auth url
           default: https://auth.europe-west1.gcp.commercetools.com
-        - key: PAYDOCK_LIVE_URL
+        - key: PAYDOCK_API_LIVE_URL
           description: Paydock api live url
-        - key: PAYDOCK_SANDBOX_URL
+        - key: PAYDOCK_API_SANDBOX_URL
           description: Paydock api sandbox url
         - key: NOTIFICATION_BASE_URL
           description: The notification URI path
