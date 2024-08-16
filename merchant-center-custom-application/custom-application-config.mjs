@@ -82,9 +82,9 @@ const config = {
         csp: {
             'connect-src': [
                 '\'self\'',
-                `https://auth.${env:APP_REGION}.commercetools.com`,
-                `https://auth.${env:APP_REGION}.commercetools.com/oauth/token`,
-                `https://api.${env:APP_REGION}.commercetools.com`,
+                `https://auth.${process.env.APP_REGION}.commercetools.com`,
+                `https://auth.${process.env.APP_REGION}.commercetools.com/oauth/token`,
+                `https://api.${process.env.APP_REGION}.commercetools.com`,
                 '${env:APPLICATION_URL}',
                 'https://api.paydock-commercetool-app.jetsoftpro.dev',
                 'https://api-sandbox.paydock.com',
@@ -94,9 +94,9 @@ const config = {
                 '\'self\'',
                 '\'unsafe-inline\'',
                 '\'unsafe-eval\'',
-                `https://auth.${env:APP_REGION}.commercetools.com`,
-                `https://auth.${env:APP_REGION}.commercetools.com/oauth/token`,
-                `https://api.${env:APP_REGION}.commercetools.com`,
+                `https://auth.${process.env.APP_REGION}.commercetools.com`,
+                `https://auth.${process.env.APP_REGION}.commercetools.com/oauth/token`,
+                `https://api.${process.env.APP_REGION}.commercetools.com`,
                 '${env:APPLICATION_URL}',
                 'https://api.paydock-commercetool-app.jetsoftpro.dev',
                 'https://api-sandbox.paydock.com',
@@ -118,9 +118,9 @@ const config = {
             ],
             'frame-src': [
                 '\'self\'',
-                `https://auth.${env:APP_REGION}.commercetools.com`,
-                `https://auth.${env:APP_REGION}.commercetools.com/oauth/token`,
-                `https://api.${env:APP_REGION}.commercetools.com`,
+                `https://auth.${process.env.APP_REGION}.commercetools.com`,
+                `https://auth.${process.env.APP_REGION}.commercetools.com/oauth/token`,
+                `https://api.${process.env.APP_REGION}.commercetools.com`,
                 '${env:APPLICATION_URL}',
                 'https://api-sandbox.paydock.com',
                 'https://api.paydock.com'
