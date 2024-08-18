@@ -1,16 +1,16 @@
-import {expect, test} from '@jest/globals';
+import {expect, test, jest} from '@jest/globals';
 import fetch from 'node-fetch';
 import config from "../../src/config/config.js";
 import {setupServer} from "../../src/server.js";
 import {getAuthorizationRequestHeader, hasValidAuthorizationHeader} from "../../src/validator/authentication.js";
 
-const request = require('supertest');
+const request = jest.requireActual('supertest');
 
-const paymentExtensionRequest = require('../../test-data/paymentHandler/create-precharge.json');
-const preChargeRequest = require('../../test-data/paymentHandler/get-payment-methods.handler.request.json');
-const moduleConfigData = require('../../test-data/moduleConfig.json');
-const configData = require('../../test-data/config.json');
-const preChargeRequestData = require('../../test-data/paymentHandler/create-precharge.json');
+const paymentExtensionRequest = jest.requireActual('../../test-data/paymentHandler/create-precharge.json');
+const preChargeRequest = jest.requireActual('../../test-data/paymentHandler/get-payment-methods.handler.request.json');
+const moduleConfigData = jest.requireActual('../../test-data/moduleConfig.json');
+const configData = jest.requireActual('../../test-data/config.json');
+const preChargeRequestData = jest.requireActual('../../test-data/paymentHandler/create-precharge.json');
 
 const {Response} = jest.requireActual('node-fetch');
 
@@ -19,7 +19,7 @@ jest.mock('node-fetch');
 jest.mock('../../src/config/config.js');
 jest.mock('../../src/config/config-loader.js', () => {
     const originalModule = jest.requireActual('../../src/config/config-loader.js');
-    const loaderConfigResult = require('../../test-data/extentionConfig.json')
+    const loaderConfigResult = jest.requireActual('../../test-data/extentionConfig.json')
 
     return {
         __esModule: true,
@@ -58,19 +58,19 @@ describe('Integration::PaymentHandler::makePreCharge::', () => {
     })
 
     afterEach(async () => {
-        if (preChargeRequestData.hasOwnProperty('wallet_type')) {
+        if (Object.prototype.hasOwnProperty.call(preChargeRequestData, 'wallet_type')) {
             delete preChargeRequestData.wallet_type
         }
-        if (preChargeRequestData.hasOwnProperty('success_url')) {
+        if (Object.prototype.hasOwnProperty.call(preChargeRequestData, 'success_url')) {
             delete preChargeRequestData.success_url
         }
-        if (preChargeRequestData.hasOwnProperty('error_url')) {
+        if (Object.prototype.hasOwnProperty.call(preChargeRequestData,'error_url')) {
             delete preChargeRequestData.error_url
         }
-        if (preChargeRequestData.hasOwnProperty('pay_later')) {
+        if (Object.prototype.hasOwnProperty.call(preChargeRequestData,'pay_later')) {
             delete preChargeRequestData.pay_later
         }
-        if (preChargeRequestData.hasOwnProperty('fraud')) {
+        if (Object.prototype.hasOwnProperty.call(preChargeRequestData,'fraud')) {
             delete preChargeRequestData.fraud
         }
 

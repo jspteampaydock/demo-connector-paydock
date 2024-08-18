@@ -8,9 +8,6 @@ const logger = httpUtils.getLogger();
 
 async function processRequest(request, response) {
     if (request.method !== 'POST') {
-        logger.debug(
-            `Received non-POST request: ${request.method}. The request will not be processed...`,
-        );
         return sendInvalidMethodResponse(response);
     }
 

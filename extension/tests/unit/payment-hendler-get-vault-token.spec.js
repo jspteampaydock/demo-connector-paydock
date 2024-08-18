@@ -1,13 +1,23 @@
-import { expect, test } from '@jest/globals';
+import {expect, test, jest} from '@jest/globals';
+
 import { getVaultToken } from '../../src/service/web-component-service.js';
 import { createSetCustomFieldAction } from '../../src/paymentHandler/payment-utils.js';
 import handler from '../../src/paymentHandler/get-vault-token.handler.js';
 import c from '../../src/config/constants.js';
-
 // Mocking the dependencies
 jest.mock('../../src/service/web-component-service.js');
 jest.mock('../../src/paymentHandler/payment-utils.js');
 
+jest.mock('../../src/config/config-loader.js', () => {
+    const originalModule = jest.requireActual('../../src/config/config-loader.js');
+    const loaderConfigResult = jest.requireActual('../../test-data/extentionConfig.json')
+
+    return {
+        __esModule: true,
+        ...originalModule,
+        loadConfig: jest.fn(() => loaderConfigResult),
+    };
+});
 describe('Unit::getVaultTokenHandler::', () => {
     const paymentObject = {
         custom: {

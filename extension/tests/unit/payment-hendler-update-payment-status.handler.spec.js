@@ -1,4 +1,4 @@
-import {jest} from '@jest/globals';
+import {jest, expect} from '@jest/globals';
 import handler from '../../src/paymentHandler/update-payment-status.handler.js';
 import {createSetCustomFieldAction} from '../../src/paymentHandler/payment-utils.js';
 import {updatePaydockStatus} from '../../src/service/web-component-service.js';
@@ -11,7 +11,16 @@ jest.mock('../../src/service/web-component-service.js');
 jest.mock('../../src/utils.js');
 jest.mock('../../src/config/config.js');
 
+jest.mock('../../src/config/config-loader.js', () => {
+    const originalModule = jest.requireActual('../../src/config/config-loader.js');
+    const loaderConfigResult = jest.requireActual('../../test-data/extentionConfig.json')
 
+    return {
+        __esModule: true,
+        ...originalModule,
+        loadConfig: jest.fn(() => loaderConfigResult),
+    };
+});
 describe('Unit::update-payment-status.handler::execute', () => {
     let paymentObject;
     let paymentExtensionRequest;

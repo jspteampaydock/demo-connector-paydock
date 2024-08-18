@@ -92,6 +92,7 @@ function createAddTransactionActionByResponse(amount, currencyCode, response) {
 export {
     createSetCustomFieldAction,
     isValidMetadata,
+    createAddTransactionAction,
     getPaymentKeyUpdateAction,
     createAddTransactionActionByResponse,
     deleteCustomFieldAction

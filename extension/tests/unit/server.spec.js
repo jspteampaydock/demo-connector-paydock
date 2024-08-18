@@ -7,7 +7,7 @@ const request = require('supertest');
 jest.mock('../../src/api/payment/payment.controller.js');
 jest.mock('../../src/config/config-loader.js', () => {
     const originalModule = jest.requireActual('../../src/config/config-loader.js');
-    const loaderConfigResult = require('../../test-data/extentionConfig.json')
+    const loaderConfigResult = jest.requireActual('../../test-data/extentionConfig.json')
 
     return {
         __esModule: true,
