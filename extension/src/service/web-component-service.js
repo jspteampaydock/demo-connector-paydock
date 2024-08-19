@@ -1408,5 +1408,6 @@ export {
     createVaultToken,
     updatePaydockStatus,
     createPreCharge,
+    callPaydock,
     createCharge
 }

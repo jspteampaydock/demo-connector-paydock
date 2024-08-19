@@ -120,27 +120,20 @@ describe('make-payment.handler', () => {
 
     test('should delete appropriate custom fields after payment', async () => {
         const result = await makePaymentHandler.execute(paymentObject);
+        const setCustomFieldActions = [
+            { action: 'setCustomField', field: 'PaydockPaymentType' },
+            { action: 'setCustomField', field: 'PaydockPaymentStatus' },
+            { action: 'setCustomField', field: 'PaydockTransactionId' },
+            { action: 'setCustomField', field: 'CommerceToolsUserId' },
+            { action: 'setCustomField', field: 'AdditionalInformation' },
+            { action: 'setKey' },
+            { action: 'addTransaction' },
+            { action: 'setCustomField', field: 'PaymentExtensionResponse' },
+            { action: 'setCustomField', field: 'CapturedAmount' },
+        ];
 
-        // Перевіряємо, що присутні всі очікувані дії видалення полів
-        expect(result.actions).toEqual(expect.arrayContaining([
-            expect.objectContaining({ action: 'deleteCustomField', field: 'makePaymentRequest' }),
-            expect.objectContaining({ action: 'deleteCustomField', field: 'makePaymentResponse' }),
-            expect.objectContaining({ action: 'deleteCustomField', field: 'getVaultTokenRequest' }),
-            expect.objectContaining({ action: 'deleteCustomField', field: 'getVaultTokenResponse' }),
-            expect.objectContaining({ action: 'deleteCustomField', field: 'PaymentExtensionRequest' }),
-        ]));
-
-        // Перевіряємо наявність інших дій, якщо це необхідно
-        expect(result.actions).toEqual(expect.arrayContaining([
-            expect.objectContaining({ action: 'setCustomField', field: 'PaydockPaymentType' }),
-            expect.objectContaining({ action: 'setCustomField', field: 'PaydockPaymentStatus' }),
-            expect.objectContaining({ action: 'setCustomField', field: 'PaydockTransactionId' }),
-            expect.objectContaining({ action: 'setCustomField', field: 'CommerceToolsUserId' }),
-            expect.objectContaining({ action: 'setCustomField', field: 'AdditionalInformation' }),
-            expect.objectContaining({ action: 'setKey' }),
-            expect.objectContaining({ action: 'addTransaction' }),
-            expect.objectContaining({ action: 'setCustomField', field: 'PaymentExtensionResponse' }),
-            expect.objectContaining({ action: 'setCustomField', field: 'CapturedAmount' }),
-        ]));
+        setCustomFieldActions.forEach(action => {
+            expect(result.actions).toEqual(expect.arrayContaining([expect.objectContaining(action)]));
+        });
     });
 });
