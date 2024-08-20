@@ -1,5 +1,5 @@
 import { expect, jest } from '@jest/globals';
-import { callPaydock, createCharge, makePayment, updatePaydockStatus, createVaultToken, getVaultToken } from '../../src/service/web-component-service.js';
+import { cardFlow, makePayment, updatePaydockStatus, createVaultToken, getVaultToken } from '../../src/service/web-component-service.js';
 import config from '../../src/config/config.js';
 import httpUtils from '../../src/utils.js';
 import ctp from '../../src/ctp.js';
@@ -29,7 +29,7 @@ jest.mock('../../src/service/web-component-service.js', () => {
         createCharge: jest.fn(),
         callPaydock: jest.fn(),
         createVaultToken: jest.fn(),
-        getVaultToken: jest.fn(),
+        cardFlow: jest.fn(),
     };
 });
 
@@ -80,17 +80,19 @@ describe('Unit::web-component-service.js', () => {
         };
 
         config.getPaydockConfig.mockResolvedValue({
-            status: 'Failure',
-            message: 'Charge creation failed',
-            error: { message: 'Charge creation failed' }
+            card_use_on_checkout: 'Yes',
+            card_gateway_id: 'erw345er43234123',
+            card_card_save: 'Disable',
+            card_card_method_save: null,
+            card_3ds: null,
+            card_fraud: null
         });
 
         httpUtils.addPaydockLog.mockResolvedValue({});
     });
 
     test('should handle a successful card payment and return correct response', async () => {
-        createVaultToken.mockResolvedValue({ status: 'Success', token: 'vault-token-123', error: null });
-        createCharge.mockResolvedValue({ status: 'Success', paydockStatus: 'paid', chargeId: 'charge-456', error: null });
+        cardFlow.mockResolvedValue({ status: 'Success', paydockStatus: 'paid', chargeId: 'charge-456', error: null });
         mockCtpClient.fetchByKey.mockResolvedValue({ body: { version: 1 } });
         mockCtpClient.update.mockResolvedValue({ statusCode: 200 });
 

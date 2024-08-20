@@ -98,5 +98,6 @@ export default {
     getPaydockConfig,
     getCtpClient,
     getExtensionConfig,
-    getPaydockApiUrl
+    getPaydockApiUrl,
+    loadAndValidateConfig
 }

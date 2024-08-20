@@ -80,6 +80,7 @@ async function handlePaymentType(input, configurations, vaultToken, customerId, 
     try {
         switch (paymentType) {
             case 'card':
+
                 if (configurations.card_use_on_checkout === 'Yes') {
                     return await cardFlow({
                         configurations,
@@ -186,10 +187,10 @@ async function createStandalone3dsToken(data) {
 
 async function cardFlow({configurations, input, amount, currency, vaultToken, customerId}) {
     let result;
-
     switch (true) {
         case (configurations.card_card_save === 'Enable' && !!customerId):
         case (configurations.card_card_save === 'Enable' && configurations.card_card_method_save !== 'Vault token' && input.SaveCard):
+
             result = await cardCustomerCharge({
                 configurations,
                 input,
@@ -1172,7 +1173,9 @@ async function getCustomerIdByVaultToken(user_id, vault_token) {
 }
 
 async function createCharge(data, params = {}, returnObject = false) {
+
     try {
+
         let isFraud = false;
         let url = '/v1/charges';
         if (params.action !== undefined) {
