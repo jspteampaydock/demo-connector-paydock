@@ -1,17 +1,16 @@
-import fetch from 'node-fetch'
 import {serializeError} from 'serialize-error'
 import config from '../config/config.js'
 import c from '../config/constants.js'
 import httpUtils from "../utils.js";
 import ctp from "../ctp.js";
 import customObjectsUtils from "../utils/custom-objects-utils.js";
+import {callPaydock} from './paydock-api-service.js';
+import {updateOrderPaymentState}  from './ct-api-service.js';
 
 const logger = httpUtils.getLogger();
 
-
-/* Paydock integration */
-
 async function makePayment(makePaymentRequestObj) {
+
     const orderId = makePaymentRequestObj.orderId;
     const paymentSource = makePaymentRequestObj.PaydockTransactionId;
     const paymentType = makePaymentRequestObj.PaydockPaymentType;
@@ -32,7 +31,6 @@ async function makePayment(makePaymentRequestObj) {
     let chargeId = 0;
 
     const configurations = await config.getPaydockConfig('connection');
-
     if (vaultToken === undefined || !vaultToken.length) {
         const data = {
             token: paymentSource
@@ -45,6 +43,7 @@ async function makePayment(makePaymentRequestObj) {
             type: paymentType,
             configurations
         })
+
         if (response.status === 'Success') {
             vaultToken = response.token;
         }
@@ -52,10 +51,10 @@ async function makePayment(makePaymentRequestObj) {
     }
 
     let customerId = null;
-
     if (input.CommerceToolsUserId && input.CommerceToolsUserId !== 'not authorized') {
         customerId = await getCustomerIdByVaultToken(input.CommerceToolsUserId, vaultToken);
     }
+
     response = await handlePaymentType(input, configurations, vaultToken, customerId, amount, currency, paymentType);
 
     if (response) {
@@ -77,6 +76,7 @@ async function makePayment(makePaymentRequestObj) {
 }
 
 async function handlePaymentType(input, configurations, vaultToken, customerId, amount, currency, paymentType) {
+
     try {
         switch (paymentType) {
             case 'card':
@@ -135,6 +135,7 @@ async function getVaultToken(getVaultTokenRequestObj) {
 }
 
 async function createVaultToken({data, userId, saveCard, type, configurations}) {
+
     const {response} = await callPaydock('/v1/vault/payment_sources/', data, 'POST');
 
     if (response.status === 201) {
@@ -295,7 +296,6 @@ async function cardFraud3DsCharge({
                 paydockStatus: 'paydock-failed'
             }
     }
-
     if (result.status === 'Success' && configurations.card_card_save === 'Enable' && !customerId && (
         configurations.card_card_method_save === 'Customer with Gateway ID' ||
         configurations.card_card_method_save === 'Customer without Gateway ID'
@@ -430,6 +430,7 @@ async function cardFraud3DsStandaloneCharge({configurations, input, amount, curr
         };
 
         await customObjectsUtils.setItem(`paydock_fraud_${input.orderId}`, JSON.stringify(cacheData));
+
         result.paydockStatus = 'paydock-pending';
     } else {
         result.paydockStatus = 'paydock-failed';
@@ -1204,7 +1205,6 @@ async function createCharge(data, params = {}, returnObject = false) {
         if (returnObject) {
             return response;
         }
-
         if (response.status === 201) {
             return {
                 status: "Success",
@@ -1242,131 +1242,6 @@ function getAdditionalFields(input) {
     return additionalFields
 }
 
-async function callPaydock(url, data, method) {
-    let returnedRequest
-    let returnedResponse
-    url = await generatePaydockUrlAction(url);
-    try {
-        const {response, request} = await fetchAsyncPaydock(url, data, method)
-        returnedRequest = request
-        returnedResponse = response
-    } catch (err) {
-        returnedRequest = {body: JSON.stringify(data)}
-        returnedResponse = serializeError(err)
-    }
-
-    return {request: returnedRequest, response: returnedResponse}
-}
-
-async function fetchAsyncPaydock(
-    url,
-    requestObj,
-    method
-) {
-    let response
-    let responseBody
-    let responseBodyInText
-    const request = await buildRequestPaydock(requestObj, method)
-
-    try {
-        response = await fetch(url, request)
-        responseBodyInText = await response.text()
-        responseBody = responseBodyInText ? JSON.parse(responseBodyInText) : ''
-    } catch (err) {
-        if (response)
-            // Handle non-JSON format response
-            throw new Error(
-                `Unable to receive non-JSON format resposne from Paydock API : ${responseBodyInText}`,
-            )
-        // Error in fetching URL
-        else throw err
-    } finally {
-        if (responseBody.additionalData) {
-            delete responseBody.additionalData
-        }
-    }
-    return {response: responseBody, request}
-}
-
-async function generatePaydockUrlAction(url) {
-    const apiUrl = await config.getPaydockApiUrl();
-    return apiUrl + url;
-}
-
-async function buildRequestPaydock(requestObj, methodOverride) {
-    const paydockCredentials = await config.getPaydockConfig('connection');
-    let requestHeaders = {}
-    if (paydockCredentials.credentials_type === 'credentials') {
-        requestHeaders = {
-            'Content-Type': 'application/json',
-            'x-user-secret-key': paydockCredentials.credentials_secret_key
-        }
-    } else {
-        requestHeaders = {
-            'Content-Type': 'application/json',
-            'x-access-token': paydockCredentials.credentials_access_key
-        }
-    }
-
-    const request = {
-        method: methodOverride || 'POST',
-        headers: requestHeaders,
-    };
-    if (methodOverride !== 'GET') {
-        request.body = JSON.stringify(requestObj);
-    }
-    return request
-}
-
-async function updateOrderPaymentState(orderId, status) {
-    const ctpConfig = config.getExtensionConfig()
-    const ctpClient = await ctp.get(ctpConfig)
-    const paymentObject = await getPaymentByKey(ctpClient, orderId)
-    if (paymentObject) {
-        const updateData = [{
-            action: 'setCustomField',
-            name: 'PaydockPaymentStatus',
-            value: status
-        }]
-
-        const updatedOrder = await updatePaymentByKey(ctpClient, paymentObject, updateData);
-        if (updatedOrder.statusCode === 200) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-
-async function getPaymentByKey(ctpClient, paymentKey) {
-    try {
-        const result = await ctpClient.fetchByKey(ctpClient.builder.payments, paymentKey)
-        return result.body
-    } catch (err) {
-        if (err.statusCode === 404) return null
-        const errMsg =
-            `Failed to fetch a payment` +
-            `Error: ${JSON.stringify(serializeError(err))}`
-        throw new Error(errMsg)
-    }
-}
-
-async function updatePaymentByKey(ctpClient, paymentObject, updateData) {
-    try {
-        await ctpClient.update(
-            ctpClient.builder.payments,
-            paymentObject.id,
-            paymentObject.version,
-            updateData
-        )
-    } catch (err) {
-        const errMsg =
-            `Unexpected error on payment update with ID: ${paymentObject.id}.` +
-            `Failed actions: ${JSON.stringify(err)}`
-        throw new Error(errMsg)
-    }
-}
 
 async function getUserVaultTokens(user_id) {
     const ctpClient = await ctp.get(config.getExtensionConfig())
@@ -1411,6 +1286,5 @@ export {
     createVaultToken,
     updatePaydockStatus,
     createPreCharge,
-    callPaydock,
     createCharge
 }

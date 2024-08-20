@@ -34,8 +34,8 @@ describe('Payment Handler', () => {
             validateAuthorizationHeader: jest.fn(),
             hasErrors: jest.fn().mockReturnValue(false),
             getErrors: jest.fn().mockReturnValue(null),
-        };
-        withPayment.mockReturnValue(mockValidator);
+            };
+            withPayment.mockReturnValue(mockValidator);
     });
 
 
