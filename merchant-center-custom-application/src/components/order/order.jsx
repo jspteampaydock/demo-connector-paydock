@@ -446,7 +446,7 @@ const OrdersHistory = () => {
                                     changeStatus[d.order_number] === 'paydock-p-paid' ? (
                                         <>
                                             <span className="refund-base-amount">{d.amount}</span>
-                                            {d.amount - updateAmountCaptured[d.order_number]}<br/>
+                                            {Math.round((d.amount - updateAmountCaptured[d.order_number]) * 100) / 100}<br/>
                                             <span className="captured-amount">
                                                 <CapturedIcon/>
                                                 &nbsp;{updateAmountCaptured[d.order_number]}
@@ -455,7 +455,7 @@ const OrdersHistory = () => {
                                     ) : (
                                         <>
                                             <span className="refund-base-amount">{d.amount}</span>
-                                            {d.amount - updateAmountRefund[d.order_number]}<br/>
+                                            {Math.round((d.amount - updateAmountRefund[d.order_number]) * 100) / 100}<br/>
                                             <span className="refund">
                                                 <RefundIcon/>
                                                 &nbsp;{updateAmountRefund[d.order_number]}
