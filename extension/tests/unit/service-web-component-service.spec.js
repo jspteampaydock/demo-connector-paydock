@@ -1,8 +1,8 @@
-import { expect, jest } from '@jest/globals';
+import {expect, jest} from '@jest/globals';
 import * as serviceModule from '../../src/service/web-component-service.js';
 import {setItem} from '../../src/utils/custom-objects-utils.js';
-import { updateOrderPaymentState } from '../../src/service/ct-api-service.js';
-import { callPaydock } from '../../src/service/paydock-api-service.js';
+import {updateOrderPaymentState} from '../../src/service/ct-api-service.js';
+import {callPaydock} from '../../src/service/paydock-api-service.js';
 import config from '../../src/config/config.js';
 import httpUtils from '../../src/utils.js';
 import ctp from '../../src/ctp.js';
@@ -42,7 +42,7 @@ describe('web-component-service.js', () => {
         orderId: 'order-123',
         PaydockTransactionId: 'charge-123',
         PaydockPaymentType: 'card',
-        amount: { value: 10000, currency: 'AUD' },
+        amount: {value: 10000, currency: 'AUD'},
         VaultToken: 'vault-token-123',
         CommerceToolsUserId: 'user-123',
         SaveCard: true,
@@ -92,7 +92,7 @@ describe('web-component-service.js', () => {
                     resource: {
                         data: {
                             token: 'precharge-token-123',
-                            charge: { _id: 'charge-456' }
+                            charge: {_id: 'charge-456'}
                         }
                     }
                 }
@@ -100,7 +100,7 @@ describe('web-component-service.js', () => {
 
             callPaydock.mockResolvedValue(mockResponse);
 
-            const data = { amount: 10000, currency: 'AUD' };
+            const data = {amount: 10000, currency: 'AUD'};
             const result = await serviceModule.createPreCharge(data);
 
             expect(callPaydock).toHaveBeenCalledWith('/v1/charges/wallet?capture=true', data, 'POST');
@@ -113,13 +113,13 @@ describe('web-component-service.js', () => {
             const mockResponse = {
                 response: {
                     status: 400,
-                    error: { message: 'Charge creation failed' },
+                    error: {message: 'Charge creation failed'},
                 },
             };
 
             callPaydock.mockResolvedValue(mockResponse);
 
-            const data = { amount: 10000, currency: 'AUD' };
+            const data = {amount: 10000, currency: 'AUD'};
             const result = await serviceModule.createPreCharge(data);
 
             expect(callPaydock).toHaveBeenCalledWith('/v1/charges/wallet?capture=true', data, 'POST');
@@ -169,13 +169,13 @@ describe('web-component-service.js', () => {
                 },
             });
 
-            const data = { card_number: '4111111111111111', cvv: '123', expire_month: '12', expire_year: '2025' };
+            const data = {card_number: '4111111111111111', cvv: '123', expire_month: '12', expire_year: '2025'};
             const requestObj = {
                 data,
                 userId: 'user-123',
                 saveCard: true,
                 type: 'card',
-                configurations: { credentials_type: 'credentials', credentials_secret_key: 'secret-key-123' },
+                configurations: {credentials_type: 'credentials', credentials_secret_key: 'secret-key-123'},
             };
 
             const result = await serviceModule.createVaultToken(requestObj);
@@ -189,17 +189,17 @@ describe('web-component-service.js', () => {
             callPaydock.mockResolvedValue({
                 response: {
                     status: 400,
-                    error: { message: 'Vault token creation failed' },
+                    error: {message: 'Vault token creation failed'},
                 },
             });
 
-            const data = { card_number: '4111111111111111', cvv: '123', expire_month: '12', expire_year: '2025' };
+            const data = {card_number: '4111111111111111', cvv: '123', expire_month: '12', expire_year: '2025'};
             const requestObj = {
                 data,
                 userId: 'user-123',
                 saveCard: true,
                 type: 'card',
-                configurations: { credentials_type: 'credentials', credentials_secret_key: 'secret-key-123' },
+                configurations: {credentials_type: 'credentials', credentials_secret_key: 'secret-key-123'},
             };
 
             const result = await serviceModule.createVaultToken(requestObj);
@@ -217,7 +217,7 @@ describe('web-component-service.js', () => {
                     status: 201,
                     resource: {
                         data: {
-                            _3ds: { token: '3ds-token-123' },
+                            _3ds: {token: '3ds-token-123'},
                         },
                     },
                 },
@@ -225,7 +225,7 @@ describe('web-component-service.js', () => {
 
             callPaydock.mockResolvedValue(mockResponse);
 
-            const data = { amount: 10000, currency: 'AUD' };
+            const data = {amount: 10000, currency: 'AUD'};
             const result = await serviceModule.createStandalone3dsToken(data);
 
             expect(callPaydock).toHaveBeenCalledWith('/v1/charges/standalone-3ds', data, 'POST');
@@ -237,13 +237,13 @@ describe('web-component-service.js', () => {
             const mockResponse = {
                 response: {
                     status: 400,
-                    error: { message: '3ds token creation failed' },
+                    error: {message: '3ds token creation failed'},
                 },
             };
 
             callPaydock.mockResolvedValue(mockResponse);
 
-            const data = { amount: 10000, currency: 'AUD' };
+            const data = {amount: 10000, currency: 'AUD'};
             const result = await serviceModule.createStandalone3dsToken(data);
 
             expect(callPaydock).toHaveBeenCalledWith('/v1/charges/standalone-3ds', data, 'POST');
@@ -258,14 +258,14 @@ describe('web-component-service.js', () => {
                 response: {
                     status: 200,
                     resource: {
-                        data: { _id: 'charge-456' },
+                        data: {_id: 'charge-456'},
                     },
                 },
             };
 
             callPaydock.mockResolvedValue(mockResponse);
 
-            const data = { status: 'paid' };
+            const data = {status: 'paid'};
             const result = await serviceModule.updatePaydockStatus('/v1/charges/update', 'POST', data);
 
             expect(callPaydock).toHaveBeenCalledWith('/v1/charges/update', data, 'POST');
@@ -277,13 +277,13 @@ describe('web-component-service.js', () => {
             const mockResponse = {
                 response: {
                     status: 500,
-                    error: { message: 'Status update failed' },
+                    error: {message: 'Status update failed'},
                 },
             };
 
             callPaydock.mockResolvedValue(mockResponse);
 
-            const data = { status: 'paid' };
+            const data = {status: 'paid'};
             const result = await serviceModule.updatePaydockStatus('/v1/charges/update', 'POST', data);
 
             expect(callPaydock).toHaveBeenCalledWith('/v1/charges/update', data, 'POST');
@@ -306,15 +306,15 @@ describe('web-component-service.js', () => {
 
         test('should handle a successful card payment', async () => {
             makePaymentRequestObj.PaydockPaymentType = 'card'
-            makePaymentRequestObj.VaultToken =  '';
-            makePaymentRequestObj.CommerceToolsUserId =  'not authorized';
-            makePaymentRequestObj.SaveCard =  false;
+            makePaymentRequestObj.VaultToken = '';
+            makePaymentRequestObj.CommerceToolsUserId = 'not authorized';
+            makePaymentRequestObj.SaveCard = false;
 
             updateOrderPaymentState.mockResolvedValue(true);
             callPaydock.mockResolvedValue({
                 response: {
                     status: 201,
-                    resource: { data: { vault_token: 'vault-token-123', _id: 'charge-456' } },
+                    resource: {data: {vault_token: 'vault-token-123', _id: 'charge-456'}},
                 },
             });
 
@@ -330,7 +330,7 @@ describe('web-component-service.js', () => {
             });
 
             mockCtpClient.update.mockResolvedValue({
-                body: { version: 2 },
+                body: {version: 2},
             });
 
             const response = await serviceModule.makePayment(makePaymentRequestObj);
@@ -349,7 +349,7 @@ describe('web-component-service.js', () => {
             callPaydock.mockResolvedValue({
                 response: {
                     status: 400,
-                    error: { message: 'Error creating vault token' },
+                    error: {message: 'Error creating vault token'},
                 },
             });
             updateOrderPaymentState.mockResolvedValue(true);
@@ -368,7 +368,7 @@ describe('web-component-service.js', () => {
 
             mockCtpClient.update.mockResolvedValue({
                 statusCode: 200, // Returning a proper statusCode to avoid the error
-                body: { version: 2 },
+                body: {version: 2},
             });
 
             const response = await serviceModule.makePayment(makePaymentRequestObj);
@@ -386,7 +386,7 @@ describe('web-component-service.js', () => {
             callPaydock.mockResolvedValue({
                 response: {
                     status: 400,
-                    error: { message: 'Charge creation failed' },
+                    error: {message: 'Charge creation failed'},
                 },
             });
             updateOrderPaymentState.mockResolvedValue(true);
@@ -407,7 +407,7 @@ describe('web-component-service.js', () => {
                 response: {
                     status: 201,
                     resource: {
-                        data: { _id: 'charge-456' },
+                        data: {_id: 'charge-456'},
                     },
                 },
             });
@@ -424,7 +424,7 @@ describe('web-component-service.js', () => {
         callPaydock.mockResolvedValue({
             response: {
                 status: 201,
-                resource: { data: { vault_token: 'existing-vault-token', _id: 'charge-456' } },
+                resource: {data: {vault_token: 'existing-vault-token', _id: 'charge-456'}},
             },
         });
 
@@ -441,7 +441,7 @@ describe('web-component-service.js', () => {
         callPaydock.mockResolvedValue({
             response: {
                 status: 201,
-                resource: { data: { vault_token: 'vault-token-123', _id: 'charge-456' } },
+                resource: {data: {vault_token: 'vault-token-123', _id: 'charge-456'}},
             },
         });
 
@@ -471,7 +471,7 @@ describe('web-component-service.js', () => {
         callPaydock.mockResolvedValue({
             response: {
                 status: 201,
-                resource: { data: { vault_token: 'vault-token-123', _id: 'charge-456' } },
+                resource: {data: {vault_token: 'vault-token-123', _id: 'charge-456'}},
             },
         });
 
@@ -490,7 +490,7 @@ describe('web-component-service.js', () => {
         callPaydock.mockResolvedValue({
             response: {
                 status: 201,
-                resource: { data: { vault_token: 'vault-token-123', _id: 'charge-456' } },
+                resource: {data: {vault_token: 'vault-token-123', _id: 'charge-456'}},
             },
         });
 
@@ -508,7 +508,7 @@ describe('web-component-service.js', () => {
             orderId: 'order-123',
             PaydockTransactionId: 'charge-123',
             PaydockPaymentType: 'Zippay',
-            amount: { value: 10000, currency: 'AUD' },
+            amount: {value: 10000, currency: 'AUD'},
             CommerceToolsUserId: 'user-123',
             SaveCard: false,
         };
@@ -517,7 +517,7 @@ describe('web-component-service.js', () => {
         callPaydock.mockResolvedValue({
             response: {
                 status: 201,
-                resource: { data: { _id: 'charge-456' } },
+                resource: {data: {_id: 'charge-456'}},
             },
         });
 
@@ -542,7 +542,7 @@ describe('web-component-service.js', () => {
         callPaydock.mockResolvedValue({
             response: {
                 status: 400,
-                error: { message: 'Fraud check failed' },
+                error: {message: 'Fraud check failed'},
             },
         });
 
@@ -569,12 +569,12 @@ describe('web-component-service.js', () => {
         callPaydock.mockResolvedValue({
             response: {
                 status: 201,
-                resource: { data: { _id: 'charge-456' } },
+                resource: {data: {_id: 'charge-456'}},
             },
         });
 
 
-        const result = await serviceModule.createCharge(data, { action: 'standalone-fraud' });
+        const result = await serviceModule.createCharge(data, {action: 'standalone-fraud'});
 
         expect(result.status).toBe('Success');
         expect(result.chargeId).toBe('charge-456');
@@ -594,7 +594,7 @@ describe('web-component-service.js', () => {
         });
 
         mockCtpClient.update.mockResolvedValue({
-            body: { version: 2 },
+            body: {version: 2},
         });
 
         const result = await serviceModule.makePayment({
@@ -602,7 +602,7 @@ describe('web-component-service.js', () => {
             VaultToken: 'vault-token-123',
             SaveCard: true,
             PaydockPaymentType: 'card',
-            amount: { value: 10000, currency: 'AUD' },
+            amount: {value: 10000, currency: 'AUD'},
         });
 
         expect(result.status).toBe('Success');
@@ -612,11 +612,11 @@ describe('web-component-service.js', () => {
         callPaydock.mockResolvedValue({
             response: {
                 status: 400,
-                error: { message: '3DS token creation failed' },
+                error: {message: '3DS token creation failed'},
             },
         });
 
-        const data = { amount: 10000, currency: 'AUD' };
+        const data = {amount: 10000, currency: 'AUD'};
         const result = await serviceModule.createStandalone3dsToken(data);
 
         expect(result.status).toBe('Failure');
@@ -627,11 +627,11 @@ describe('web-component-service.js', () => {
         callPaydock.mockResolvedValue({
             response: {
                 status: 200,
-                resource: { data: { _id: 'charge-456' } },
+                resource: {data: {_id: 'charge-456'}},
             },
         });
 
-        const data = { status: 'paid' };
+        const data = {status: 'paid'};
         const result = await serviceModule.updatePaydockStatus('/v1/charges/update', 'POST', data);
 
         expect(result.status).toBe('Success');
@@ -641,11 +641,11 @@ describe('web-component-service.js', () => {
         callPaydock.mockResolvedValue({
             response: {
                 status: 500,
-                error: { message: 'Status update failed' },
+                error: {message: 'Status update failed'},
             },
         });
 
-        const data = { status: 'paid' };
+        const data = {status: 'paid'};
         const result = await serviceModule.updatePaydockStatus('/v1/charges/update', 'POST', data);
 
         expect(result.status).toBe('Failure');
@@ -675,7 +675,7 @@ describe('web-component-service.js', () => {
         callPaydock.mockResolvedValue({
             response: {
                 status: 201,
-                resource: { data: { _id: 'charge-456' } },
+                resource: {data: {_id: 'charge-456'}},
             },
         });
 
@@ -705,7 +705,7 @@ describe('web-component-service.js', () => {
         callPaydock.mockResolvedValue({
             response: {
                 status: 201,
-                resource: { data: { _id: 'charge-456' } },
+                resource: {data: {_id: 'charge-456'}},
             },
         });
 
@@ -736,7 +736,7 @@ describe('web-component-service.js', () => {
         callPaydock.mockResolvedValue({
             response: {
                 status: 201,
-                resource: { data: { _id: 'charge-456' } },
+                resource: {data: {_id: 'charge-456'}},
             },
         });
         updateOrderPaymentState.mockResolvedValue(true);
@@ -767,7 +767,7 @@ describe('web-component-service.js', () => {
         callPaydock.mockResolvedValue({
             response: {
                 status: 201,
-                resource: { data: { _id: 'charge-456' } },
+                resource: {data: {_id: 'charge-456'}},
             },
         });
         updateOrderPaymentState.mockResolvedValue(true);
@@ -796,7 +796,7 @@ describe('web-component-service.js', () => {
         callPaydock.mockResolvedValue({
             response: {
                 status: 201,
-                resource: { data: { _id: 'charge-456' } },
+                resource: {data: {_id: 'charge-456'}},
             },
         });
 
@@ -824,7 +824,7 @@ describe('web-component-service.js', () => {
         callPaydock.mockResolvedValue({
             response: {
                 status: 201,
-                resource: { data: { _id: 'charge-456' } },
+                resource: {data: {_id: 'charge-456'}},
             },
         });
 
@@ -852,7 +852,7 @@ describe('web-component-service.js', () => {
         callPaydock.mockResolvedValue({
             response: {
                 status: 201,
-                resource: { data: { _id: 'charge-456' } },
+                resource: {data: {_id: 'charge-456'}},
             },
         });
 
@@ -880,7 +880,7 @@ describe('web-component-service.js', () => {
         callPaydock.mockResolvedValue({
             response: {
                 status: 201,
-                resource: { data: { _id: 'charge-456' } },
+                resource: {data: {_id: 'charge-456'}},
             },
         });
 
@@ -909,12 +909,12 @@ describe('web-component-service.js', () => {
         callPaydock.mockResolvedValueOnce({
             response: {
                 status: 201,
-                resource: { data: { _id: 'customer-123' } },
+                resource: {data: {_id: 'customer-123'}},
             },
         }).mockResolvedValueOnce({
             response: {
                 status: 201,
-                resource: { data: { vault_token: 'vault-token-123' } },
+                resource: {data: {vault_token: 'vault-token-123'}},
             },
         });
 
