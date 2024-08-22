@@ -18,6 +18,16 @@ jest.mock('../../src/config/config-loader.js', () => {
     };
 });
 
+jest.mock('@commercetools-backend/loggers', () => {
+    return {
+        createApplicationLogger: jest.fn(() => ({
+            info: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
+        })),
+    };
+});
 describe('preUndeployment', () => {
     beforeEach(() => {
         jest.clearAllMocks();

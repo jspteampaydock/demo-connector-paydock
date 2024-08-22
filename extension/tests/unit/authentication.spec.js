@@ -17,7 +17,6 @@ jest.mock('../../src/config/config-loader.js', () => {
     };
 });
 
-
 jest.mock('../../src/config/config.js');
 
 describe('authentication.js', () => {

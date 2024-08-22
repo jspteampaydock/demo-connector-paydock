@@ -15,6 +15,16 @@ jest.mock('../../src/config/config-loader.js', () => {
         loadConfig: jest.fn(() => loaderConfigResult),
     };
 });
+jest.mock('@commercetools-backend/loggers', () => {
+    return {
+        createApplicationLogger: jest.fn(() => ({
+            info: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
+        })),
+    };
+});
 
 describe('payment.controller.js', () => {
     let mockRequest;

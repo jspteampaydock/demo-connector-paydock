@@ -13,13 +13,21 @@ jest.mock('../../src/config/config-loader.js', () => {
     };
 });
 
-jest.mock('bunyan');
 jest.mock('serialize-error');
 jest.mock('node:fs/promises');
 jest.mock('url');
 jest.mock('path');
 jest.mock('../../src/config/config.js');
-
+jest.mock('@commercetools-backend/loggers', () => {
+    return {
+        createApplicationLogger: jest.fn(() => ({
+            info: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
+        })),
+    };
+});
 describe('utils.js', () => {
     let mockCtpClient;
 

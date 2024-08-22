@@ -4,8 +4,6 @@ import { setupExtensionResources, cleanupExtensionResources } from '../../src/se
 import config from '../../src/config/config.js';
 import ctpClientBuilder from '../../src/ctp.js';
 import utils from '../../src/utils.js';
-import { initResources } from '../../src/config/init/resources.js';
-import { generateBasicAuthorizationHeaderValue } from '../../src/validator/authentication.js';
 import { serializeError } from "serialize-error";
 
 jest.mock('../../src/config/config.js');
@@ -15,6 +13,16 @@ jest.mock('../../src/config/init/resources.js');
 jest.mock('../../src/validator/authentication.js');
 jest.mock('serialize-error');
 
+jest.mock('@commercetools-backend/loggers', () => {
+    return {
+        createApplicationLogger: jest.fn(() => ({
+            info: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
+        })),
+    };
+});
 jest.mock('../../src/config/config-loader.js', () => {
     const originalModule = jest.requireActual('../../src/config/config-loader.js');
     const loaderConfigResult = jest.requireActual('../../test-data/extentionConfig.json')

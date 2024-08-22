@@ -1,7 +1,5 @@
 import {jest, expect} from '@jest/globals';
 import paymentHandler from '../../src/paymentHandler/payment-handler.js';
-import makePaymentHandler from '../../src/paymentHandler/make-payment.handler.js';
-import getVaultTokenHandler from '../../src/paymentHandler/get-vault-token.handler.js';
 import getPaymentMethodsHandler from '../../src/paymentHandler/get-payment-methods.handler.js';
 import {deleteCustomFieldAction} from '../../src/paymentHandler/payment-utils.js';
 import c from "../../src/config/constants.js";
@@ -21,6 +19,16 @@ jest.mock('../../src/config/config-loader.js', () => {
         __esModule: true,
         ...originalModule,
         loadConfig: jest.fn(() => loaderConfigResult),
+    };
+});
+jest.mock('@commercetools-backend/loggers', () => {
+    return {
+        createApplicationLogger: jest.fn(() => ({
+            info: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
+        })),
     };
 });
 

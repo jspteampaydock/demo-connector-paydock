@@ -16,6 +16,16 @@ jest.mock('../../src/config/config-loader.js', () => {
     };
 });
 
+jest.mock('@commercetools-backend/loggers', () => {
+    return {
+        createApplicationLogger: jest.fn(() => ({
+            info: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
+        })),
+    };
+});
 jest.mock('../../src/validator/authentication.js');
 jest.mock('../../src/service/web-component-service.js', () => ({
     createStandalone3dsToken: jest.fn(),

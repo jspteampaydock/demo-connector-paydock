@@ -10,6 +10,17 @@ import ctp from '../../src/ctp.js';
 jest.mock('node-fetch');
 jest.mock('../../src/config/config.js');
 jest.mock('../../src/utils.js');
+
+jest.mock('@commercetools-backend/loggers', () => {
+    return {
+        createApplicationLogger: jest.fn(() => ({
+            info: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
+        })),
+    };
+});
 jest.mock('../../src/ctp.js', () => ({
     get: jest.fn()
 }));

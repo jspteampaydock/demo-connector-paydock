@@ -25,6 +25,16 @@ jest.mock('../../src/utils/custom-objects-utils.js', () => ({
     removeItem: jest.fn()
 }));
 
+jest.mock('@commercetools-backend/loggers', () => {
+    return {
+        createApplicationLogger: jest.fn(() => ({
+            info: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
+        })),
+    };
+});
 jest.mock('../../src/handler/notification/paydock-api-service.js', () => ({
     callPaydock: jest.fn()
 }));

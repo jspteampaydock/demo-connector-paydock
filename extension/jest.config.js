@@ -7,7 +7,6 @@ export default {
         [
             '//node_modules'
         ],
-    collectCoverage: true,
     collectCoverageFrom: [
         'src/**/*.{js,jsx,ts,tsx}',
     ],

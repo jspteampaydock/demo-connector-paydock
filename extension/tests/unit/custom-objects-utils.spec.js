@@ -14,7 +14,6 @@ jest.mock('../../src/config/config-loader.js', () => {
 });
 
 
-
 jest.mock('../../src/config/config.js');
 
 describe('custom-objects-utils', () => {
