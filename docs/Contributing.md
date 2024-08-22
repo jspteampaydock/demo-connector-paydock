@@ -1,17 +1,76 @@
 # Contribution Guide
 
-Minimum requirements are:
-- **Node.js** version 18.
-- **Npm** version 6.
+## Minimum Requirements
+- **Node.js**: Version 18
+- **Npm**: Version 6
 
-You can install all dependencies using `npm` with following command:
+## Installation
+
+To install all dependencies:
+
+1. Navigate to the service directory(extension/notification/merchant-center-custom-application):
+
+You can install all dependencies using `npm` in order to do this, you need go to folder service  and run command
+
+```
+cd extension/notification/merchant-center-custom-application
+```
+
+2. Run the following command:
 
 ```
 npm install
-```
-
-You can run test with following command:
 
 ```
-npm run test
+
+## Running the Service
+
+To start the service:
+
+1. Navigate to the service directory:
+
+```
+cd extension/notification/merchant-center-custom-application
+```
+
+2. Run the following command:
+
+```
+npm run start
+
+```
+
+## Running Tests
+To run the tests:
+
+
+1. Navigate to the service directory:
+
+```
+cd extension/notification
+```
+
+2. Run the following command:
+
+```
+npm run start
+
+```
+
+## Generating HTML Coverage Report
+
+To run tests and generate an HTML coverage report:
+
+
+1. Navigate to the service directory:
+
+```
+cd extension/notification
+```
+
+2. Run the following command:
+
+```
+npm run jest-coverage
+
 ```
