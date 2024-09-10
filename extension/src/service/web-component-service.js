@@ -1008,9 +1008,11 @@ async function createCustomerAndSaveVaultToken({configurations, input, vaultToke
 
         if (
             shouldSaveVaultToken({type, saveCard: input.SaveCard, userId: input.CommerceToolsUserId, configurations}) &&
+            (
                 (
                     type === 'card' && ['Customer with Gateway ID', 'Customer without Gateway ID'].includes(configurations.card_card_method_save)
                 )
+            )
         ) {
             const tokenData = await getVaultTokenData(vaultToken);
             const result = await saveUserToken({
