@@ -2,7 +2,7 @@
   "key": "paydock-order-extension",
   "destination": {
     "type": "HTTP",
-    "url": "${ctpPaydockIntegrationBaseUrl}/create-order"
+    "url": "${ctpPaydockIntegrationBaseUrl}/extension/create-order"
   },
   "triggers": [
     {

@@ -28,7 +28,7 @@ deployAs:
           required: true
   - name: extension
     applicationType: service
-    endpoint: /
+    endpoint: /extension
     scripts:
       postDeploy: npm install && npm run extension:post-deploy
       preUndeploy: npm install && npm run extension:pre-undeploy
@@ -60,7 +60,7 @@ deployAs:
           required: false
   - name: notification
     applicationType: service
-    endpoint: /
+    endpoint: /notification
     scripts:
       postDeploy: npm install && npm run notification:post-deploy
       preUndeploy: npm install && npm run notification:pre-undeploy

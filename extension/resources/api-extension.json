@@ -2,7 +2,7 @@
   "key": "paydock-pay-integration-payment-extension",
   "destination": {
     "type": "HTTP",
-    "url": "${ctpPaydockIntegrationBaseUrl}"
+    "url": "${ctpPaydockIntegrationBaseUrl}/extension"
   },
   "triggers": [
     {
