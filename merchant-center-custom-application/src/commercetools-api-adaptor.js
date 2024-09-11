@@ -16,31 +16,31 @@ class CommerceToolsAPIAdapter {
 
   async setAccessToken(accessToken, tokenExpirationInSeconds) {
     this.accessToken = accessToken;
-    localStorage.setItem(this.projectKey + '_accessToken', accessToken);
     const tokenExpiration = new Date();
     tokenExpiration.setSeconds(tokenExpiration.getSeconds() + tokenExpirationInSeconds);
-    localStorage.setItem(this.projectKey + '_tokenExpiration', tokenExpiration.getTime());
+    this.tokenExpirationTime = tokenExpiration.getTime();
   }
 
   async getAccessToken() {
-    const tokenExpiration = parseInt(localStorage.getItem(this.projectKey + '_tokenExpiration'));
     const currentTimestamp = new Date().getTime();
-    if (!this.accessToken && localStorage.getItem(this.projectKey + '_accessToken')) {
-      this.accessToken = localStorage.getItem(this.projectKey + '_accessToken');
-    }
-    if (!this.accessToken || currentTimestamp > tokenExpiration) {
+    if (!this.accessToken || currentTimestamp > this.tokenExpirationTime) {
       await this.authenticate();
     }
-
     return this.accessToken;
   }
 
   async authenticate() {
     const authUrl = `https://auth.${this.region}.commercetools.com/oauth/token`;
+
     const authData = new URLSearchParams();
     authData.append('grant_type', 'client_credentials');
-    authData.append('scope', 'manage_project:' + this.projectKey);
+    authData.append('scope', [
+      `manage_orders:${this.projectKey}`,
+      `manage_payments:${this.projectKey}`,
+    ].join(' '));
+
     const auth = btoa(`${this.clientId}:${this.clientSecret}`);
+
     try {
       const response = await fetch(authUrl, {
         headers: {
@@ -50,6 +50,7 @@ class CommerceToolsAPIAdapter {
         body: authData.toString(),
         method: 'POST',
       });
+
       const authResult = await response.json();
       this.setAccessToken(authResult.access_token, authResult.expires_in);
     } catch (error) {
@@ -62,10 +63,11 @@ class CommerceToolsAPIAdapter {
       const accessToken = await this.getAccessToken();
       const apiUrl = `https://api.${this.region}.commercetools.com/${this.projectKey}${endpoint}`;
       const response = await fetch(apiUrl, {
-        headers: {
-          authorization: `Bearer ${accessToken}`,
-        },
         body: body ? JSON.stringify(body) : null,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
         method: method,
       });
 
@@ -77,7 +79,6 @@ class CommerceToolsAPIAdapter {
 
       return await response.json();
     } catch (error) {
-      console.error('API request error:', error);
       throw error;
     }
   }
@@ -104,7 +105,7 @@ class CommerceToolsAPIAdapter {
     if (secretKey && notificationUrl) {
       const paydockApiAdaptor = new PaydockApiAdaptor(isLive, isToken, secretKey, notificationUrl);
       paydockApiAdaptor.registerNotifications().catch(error => {
-        console.log(error.response.data.error)
+        throw error.response.data.error;
       });
     }
   }
@@ -227,7 +228,6 @@ class CommerceToolsAPIAdapter {
     const orderId = data.orderId;
     let response = {};
     let error = null;
-
     try {
       const payment = await this.makeRequest('/payments/' + orderId);
       if (payment) {
@@ -281,7 +281,7 @@ class CommerceToolsAPIAdapter {
       };
 
       if (order.paymentInfo.payments) {
-         this.collectArrayOrdersPayments(order.paymentInfo.payments, paymentsArray, objOrder);
+        this.collectArrayOrdersPayments(order.paymentInfo.payments, paymentsArray, objOrder);
       }
       paydockOrders.push(objOrder);
     }
