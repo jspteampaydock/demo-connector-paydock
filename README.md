@@ -99,26 +99,26 @@ This connector consists of three main components, each with its own set of envir
 
 The default commercetools payment type does not include all the necessary fields required for full integration with Paydock. Below is a table that outlines the required custom fields (which are automatically added after installing the connector) to the commercetools payment resource for proper handling of Paydock-specific payment information:
 
-| Field Name                     | Label                               | Type      | Input Hint    | Description                                                             |
-|---------------------------------|-------------------------------------|-----------|--------------|-------------------------------------------------------------------------|
-| `CommercetoolsProjectKey`       | Commercetools project key           | String    | SingleLine   | The commercetools project key                                           |
-| `PaydockPaymentStatus`          | Paydock payment status              | Enum      | SingleLine   | The status of the payment in Paydock (e.g., pending, paid, refunded, etc.) |
-| `PaydockTransactionId`          | Paydock transaction ID              | String    | SingleLine   | Unique identifier of the transaction in Paydock                         |
-| `PaydockPaymentType`            | Payment type                        | String    | SingleLine   | Type of payment processed via Paydock(Card, PayPal and etc)             |
-| `CommerceToolsUserId`           | Commerce tools user ID              | String    | SingleLine   | ID of the user in commercetools                                         |
-| `SaveCard`                      | Save Card                           | Boolean   | SingleLine   | Indicates whether to save the card for future transactions              |
-| `VaultToken`                    | Vault token                         | String    | SingleLine   | Vault payment token representing user’s payment information             |
-| `AdditionalInformation`         | Additional information              | String    | MultiLine    | Any additional information relevant to the payment                      |
-| `getVaultTokenRequest`          | Vault token request                 | String    | MultiLine    | Request for generating a vault token                                    |
-| `getStandalone3dsTokenRequest`  | Standalone 3DS token request        | String    | MultiLine    | Request for generating a 3DS token                                      |
-| `getStandalone3dsTokenResponse` | Standalone 3DS Token Response       | String    | MultiLine    | Response from Paydock after generating a 3DS token                      |
-| `getVaultTokenResponse`         | Vault token response                | String    | MultiLine    | Response after generating a vault token                                 |
-| `makePaymentRequest`            | Payment request                     | String    | MultiLine    | Data sent to Paydock to make a payment                                  |
-| `makePaymentResponse`           | Payment response                    | String    | MultiLine    | Response from Paydock after attempting a payment                        |
-| `RefundedAmount`                | Refunded amount                     | Number    | SingleLine   | The amount refunded via Paydock                                         |
-| `CapturedAmount`                | Captured amount                     | Number    | SingleLine   | The amount captured from the transaction                                |
-| `PaymentExtensionRequest`        | Payment extension request          | String    | MultiLine    | Request for generating various operations associated with the payment, such as updating status, retrieving payment methods, and other actions. |
-| `PaymentExtensionResponse`      | Payment extension response          | String    | MultiLine    | Response data related to payment extension requests       
+| Field Name                     | Label                             | Type      | Input Hint    | Description                                                             |
+|---------------------------------|-----------------------------------|-----------|---------------|-------------------------------------------------------------------------|
+| `CommercetoolsProjectKey`       | Commercetools project key         | String    | SingleLine    | The commercetools project key                                           |
+| `PaydockPaymentStatus`          | Paydock payment status            | Enum      | SingleLine    | The status of the payment in Paydock (e.g., paydock-pending, paydock-paid, refunded, etc.) |
+| `PaydockTransactionId`          | Paydock transaction ID            | String    | SingleLine    | Unique identifier of the transaction in Paydock                         |
+| `PaydockPaymentType`            | Payment type                      | String    | SingleLine    | Type of payment processed via Paydock(Card, PayPal and etc)             |
+| `CommerceToolsUserId`           | Commerce tools user ID            | String    | SingleLine    | ID of the user in commercetools                                         |
+| `SaveCard`                      | Save Card                         | Boolean   | SingleLine    | Indicates whether to save the card for future transactions              |
+| `VaultToken`                    | Vault token                       | String    | SingleLine    | Vault payment token representing user’s payment information             |
+| `AdditionalInformation`         | Additional information            | String    | MultiLine     | Any additional information relevant to the payment                      |
+| `getVaultTokenRequest`          | Vault token request               | String    | MultiLine     | Request for generating a vault token                                    |
+| `getStandalone3dsTokenRequest`  | Standalone 3DS token request      | String    | MultiLine     | Request for generating a 3DS token                                      |
+| `getStandalone3dsTokenResponse` | Standalone 3DS Token Response     | String    | MultiLine     | Response from Paydock after generating a 3DS token                      |
+| `getVaultTokenResponse`         | Vault token response              | String    | MultiLine     | Response after generating a vault token                                 |
+| `makePaymentRequest`            | Payment request                   | String    | MultiLine     | Data sent to Paydock to make a payment                                  |
+| `makePaymentResponse`           | Payment response                  | String    | MultiLine     | Response from Paydock after attempting a payment                        |
+| `RefundedAmount`                | Refunded amount                   | Number    | SingleLine    | The amount refunded via Paydock                                         |
+| `CapturedAmount`                | Captured amount                   | Number    | SingleLine    | The amount captured from the transaction                                |
+| `PaymentExtensionRequest`       | Payment extension request         | String    | MultiLine     | Request for generating various operations associated with the payment, such as updating status, retrieving payment methods, and other actions. |
+| `PaymentExtensionResponse`      | Payment extension response        | String    | MultiLine     | Response data related to payment extension requests       
 
 ### Enum Values for `PaydockPaymentStatus`
 
