@@ -29,7 +29,7 @@ async function createCustomObjectNotificationUrl(ctpClient, notificationUrl) {
     const objectNotificationUrlDraft = {
         container: "paydock-notification",
         key: "url",
-        value: `${notificationUrl}/notification`
+        value: `${notificationUrl}`
     };
     try {
         return await ctpClient.create(ctpClient.builder.customObjects, objectNotificationUrlDraft);

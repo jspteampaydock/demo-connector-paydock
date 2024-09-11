@@ -1,7 +1,7 @@
 import { handleNotification } from './api/notification/notification.controller.js'
 
 const routes = {
-  '/notification': handleNotification
+  '/': handleNotification
 }
 
 export { routes }
