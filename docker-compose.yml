@@ -17,7 +17,6 @@ services:
       - "COMMERCETOOLS_AUTH_URL=xxxxxx"
       - "PAYDOCK_API_LIVE_URL=xxxxxx"
       - "PAYDOCK_API_SANDBOX_URL=xxxxxx"
-      - "EXTENSION_BASE_URL=xxxxxx"
 
   paydock-notification:
     build:
@@ -34,5 +33,4 @@ services:
       - "COMMERCETOOLS_AUTH_URL=xxxxxx"
       - "PAYDOCK_API_LIVE_URL=xxxxxx"
       - "PAYDOCK_API_SANDBOX_URL=xxxxxx"
-      - "NOTIFICATION_BASE_URL=xxxxxx"
 

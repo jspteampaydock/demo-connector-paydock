@@ -43,7 +43,6 @@ echo 'COMMERCETOOLS_CLIENT_ID = [COMMERCETOOLS_CLIENT_ID]
    COMMERCETOOLS_AUTH_URL = [COMMERCETOOLS_AUTH_URL]
    PAYDOCK_API_LIVE_URL = [PAYDOCK_API_LIVE_URL]
    PAYDOCK_API_SANDBOX_URL = [PAYDOCK_API_SANDBOX_URL]
-   NOTIFICATION_BASE_URL = [NOTIFICATION_BASE_URL]
 }' > ./notification/.env
 ```
 
@@ -57,7 +56,7 @@ Build the following docker images:
 
 5. Launch the Docker container with the following command:
 
-- `docker run -e  COMMERCETOOLS_CLIENT_ID=**** COMMERCETOOLS_CLIENT_SECRET=**** COMMERCETOOLS_PROJECT_KEY=**** COMMERCETOOLS_API_URL=**** COMMERCETOOLS_AUTH_URL=*** PAYDOCK_API_LIVE_URL=**** PAYDOCK_API_SANDBOX_URL=**** NOTIFICATION_BASE_URL=****  -p 8443:8443 commercetools-payment-connector-notification`
+- `docker run -e  COMMERCETOOLS_CLIENT_ID=**** COMMERCETOOLS_CLIENT_SECRET=**** COMMERCETOOLS_PROJECT_KEY=**** COMMERCETOOLS_API_URL=**** COMMERCETOOLS_AUTH_URL=*** PAYDOCK_API_LIVE_URL=**** PAYDOCK_API_SANDBOX_URL=****  -p 8443:8443 commercetools-payment-connector-notification`
 
 6. Replace the placeholder `xxxxxx` for PAYDOCK_INTEGRATION_CONFIG variable  with your Json-escapes string.
 ###
