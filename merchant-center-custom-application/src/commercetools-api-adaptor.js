@@ -123,18 +123,19 @@ class CommerceToolsAPIAdapter {
 
   async getLogs() {
     let logs = [];
-    let paydockLogs = await this.makeRequest('/custom-objects/paydock-logs?&sort=key+desc');
+    let paydockLogs = await this.makeRequest('/payments/?&sort=createdAt+desc');
     if (paydockLogs.results) {
       paydockLogs.results.forEach((paydockLog) => {
-        let message = typeof paydockLog.value.message === 'string' ? paydockLog.value.message : null;
-        let log = {
-          operation_id: paydockLog.value.paydockChargeID,
-          date: paydockLog.createdAt,
-          operation: this.getStatusByKey(paydockLog.value.operation),
-          status: paydockLog.value.status,
-          message: message,
-        };
-        logs.push(log);
+        paydockLog.interfaceInteractions.forEach((interactionLog) => {
+          let message = typeof interactionLog.fields.message === 'string' ? interactionLog.fields.message : null;
+          logs.push({
+            operation_id: interactionLog.fields.chargeId,
+            date: interactionLog.fields.createdAt,
+            operation: this.getStatusByKey(interactionLog.fields.operation),
+            status: interactionLog.fields.status,
+            message: message,
+          })
+        })
       });
     }
     return logs;

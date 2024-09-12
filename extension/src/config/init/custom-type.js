@@ -4,9 +4,9 @@ import utils from '../../utils.js'
 
 const mainLogger = utils.getLogger()
 
-async function initPaymentIteractionType(ctpClient, projectKey) {
+async function initPaymentInteractionType(ctpClient, projectKey) {
   const paymentCustomType = await utils.readAndParseJsonFile(
-      'resources/paydock-payment-log-iteraction.json',
+      'resources/paydock-payment-log-interaction.json',
   )
   return syncCustomType(
       ctpClient,
@@ -86,5 +86,5 @@ async function fetchTypeByKey(ctpClient, key) {
 export {
   initPaymentCustomType,
   initCustomerVaultTokens,
-  initPaymentIteractionType
+  initPaymentInteractionType
 }
