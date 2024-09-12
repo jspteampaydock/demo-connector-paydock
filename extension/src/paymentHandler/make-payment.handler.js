@@ -11,14 +11,13 @@ async function execute(paymentObject) {
         paymentObject.custom.fields.makePaymentRequest,
     )
     let capturedAmount = paymentObject.amountPlanned.centAmount;
-
     if (paymentObject.amountPlanned.type === 'centPrecision') {
         const fraction = 10 ** paymentObject.amountPlanned.fractionDigits;
         capturedAmount = paymentObject.amountPlanned.centAmount / fraction;
         makePaymentRequestObj.amount.value = capturedAmount;
     }
     let paymentActions = [];
-    const actions = []
+    let actions = []
     const customFieldsToDelete = [
         'makePaymentRequest',
         'makePaymentResponse',
@@ -39,10 +38,31 @@ async function execute(paymentObject) {
         };
     }
     const requestBodyJson = JSON.parse(paymentObject?.custom?.fields?.makePaymentRequest);
+    const paydockStatus = response?.paydockStatus ?? requestBodyJson?.PaydockPaymentStatus;
+    actions = generateActionsFromResponse(actions, response, requestBodyJson, capturedAmount, paymentObject, paydockStatus);
 
+    if (paydockStatus) {
+        const {orderState, orderPaymentState} = getCommercetoolsStatusesByPaydockStatus(paydockStatus);
+        actions.push(createSetCustomFieldAction(c.CTP_INTERACTION_PAYMENT_EXTENSION_RESPONSE, JSON.stringify({
+            orderPaymentStatus: orderPaymentState,
+            orderStatus: orderState
+        })));
+
+        if (paydockStatus === c.STATUS_TYPES.PAID) {
+            actions.push(createSetCustomFieldAction('CapturedAmount', capturedAmount));
+        }
+    } else {
+        customFieldsToDelete.push(c.CTP_INTERACTION_PAYMENT_EXTENSION_RESPONSE)
+    }
+    paymentActions = await deleteCustomFields(actions, paymentObject, customFieldsToDelete)
+    return {
+        actions: paymentActions
+    }
+}
+
+function generateActionsFromResponse(actions, response, requestBodyJson, capturedAmount, paymentObject, paydockStatus) {
     const paymentMethod = requestBodyJson?.PaydockPaymentType;
     const paydockTransactionId = response?.chargeId ?? requestBodyJson?.PaydockTransactionId;
-    const paydockStatus = response?.paydockStatus ?? requestBodyJson?.PaydockPaymentStatus;
     const commerceToolsUserId = requestBodyJson?.CommerceToolsUserId;
     const additionalInfo = requestBodyJson?.AdditionalInfo;
 
@@ -63,42 +83,14 @@ async function execute(paymentObject) {
     if (additionalInfo) {
         actions.push(createSetCustomFieldAction(c.CTP_CUSTOM_FIELD_ADDITIONAL_INFORMATION, JSON.stringify(additionalInfo)));
     }
-    const updatePaymentAction = getPaymentKeyUpdateAction(
-        paymentObject.key,
-        {body: paymentObject.custom.fields.makePaymentRequest},
-        response,
-    )
-    if (updatePaymentAction) actions.push(updatePaymentAction)
+    const updatePaymentAction = getPaymentKeyUpdateAction(paymentObject.key, {body: paymentObject.custom.fields.makePaymentRequest}, response);
+    if (updatePaymentAction) actions.push(updatePaymentAction);
 
-    const addTransactionAction = createAddTransactionActionByResponse(
-        paymentObject.amountPlanned.centAmount,
-        paymentObject.amountPlanned.currencyCode,
-        response,
-    )
+    const addTransactionAction = createAddTransactionActionByResponse(paymentObject.amountPlanned.centAmount, paymentObject.amountPlanned.currencyCode, response);
+    if (addTransactionAction) actions.push(addTransactionAction);
 
-    if (addTransactionAction) {
-        actions.push(addTransactionAction)
-    }
-
-    if (paydockStatus) {
-        const {orderState, orderPaymentState} = getCommercetoolsStatusesByPaydockStatus(paydockStatus)
-        actions.push(createSetCustomFieldAction(c.CTP_INTERACTION_PAYMENT_EXTENSION_RESPONSE, JSON.stringify({
-            orderPaymentStatus: orderPaymentState,
-            orderStatus: orderState
-        })));
-        if (paydockStatus === c.STATUS_TYPES.PAID) {
-            actions.push(createSetCustomFieldAction('CapturedAmount', capturedAmount));
-        }
-
-    } else {
-        customFieldsToDelete.push(c.CTP_INTERACTION_PAYMENT_EXTENSION_RESPONSE)
-    }
-    paymentActions = await deleteCustomFields(actions, paymentObject, customFieldsToDelete)
-    return {
-        actions: paymentActions
-    }
+    return actions;
 }
-
 
 function getCommercetoolsStatusesByPaydockStatus(paydockStatus) {
     let orderPaymentState

@@ -44,7 +44,7 @@ describe('Uint::Server::', () => {
         }));
 
         return request(server)
-            .post('/')
+            .post('/notification')
             .send({test: 'test'})
             .expect(500)
     })

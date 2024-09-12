@@ -195,7 +195,7 @@ describe('processNotification', () => {
             updateAction[0].value = 'paydock-paid';
 
             return request(server)
-                .post('/')
+                .post('/notification')
                 .send(data)
                 .expect(200)
                 .then((response) => {
@@ -211,7 +211,7 @@ describe('processNotification', () => {
             updateAction[0].value = 'paydock-paid';
 
             return request(server)
-                .post('/')
+                .post('/notification')
                 .send(data)
                 .expect(200)
                 .then((response) => {
@@ -230,7 +230,7 @@ describe('processNotification', () => {
             updateAction[0].value = 'paydock-refunded';
 
             return request(server)
-                .post('/')
+                .post('/notification')
                 .send(data)
                 .expect(200)
                 .then((response) => {
@@ -259,7 +259,7 @@ describe('processNotification', () => {
             updateAction[0].value = 'paydock-requested';
 
             return request(server)
-                .post('/')
+                .post('/notification')
                 .send(data)
                 .expect(200)
                 .then((response) => {
@@ -288,7 +288,7 @@ describe('processNotification', () => {
             updateAction[0].value = 'paydock-failed';
 
             return request(server)
-                .post('/')
+                .post('/notification')
                 .send(data)
                 .expect(200)
                 .then((response) => {
@@ -317,7 +317,7 @@ describe('processNotification', () => {
             updateAction[0].value = 'paydock-failed';
 
             return request(server)
-                .post('/')
+                .post('/notification')
                 .send(data)
                 .expect(200)
                 .then((response) => {
@@ -343,7 +343,7 @@ describe('processNotification', () => {
             data.data.capture = true;
 
             return request(server)
-                .post('/')
+                .post('/notification')
                 .send(data)
                 .expect(200)
                 .then((response) => {
@@ -358,7 +358,7 @@ describe('processNotification', () => {
             data.data.capture = true;
 
             const firstRequest = request(server)
-                .post('/')
+                .post('/notification')
                 .send(data)
                 .expect(200)
                 .then((response) => {
@@ -369,7 +369,7 @@ describe('processNotification', () => {
             data.data.status = 'failed';
 
             const secondRequest = request(server)
-                .post('/')
+                .post('/notification')
                 .send(data)
                 .expect(200)
                 .then((response) => {

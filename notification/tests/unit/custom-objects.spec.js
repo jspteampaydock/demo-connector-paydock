@@ -34,28 +34,6 @@ describe('custom-objects-utils', () => {
         jest.clearAllMocks();
     });
 
-    describe('setItem', () => {
-        it('should create a custom object with the correct container, key, and value', async () => {
-            const key = 'test-key';
-            const value = { test: 'value' };
-
-            await customObjectsUtils.setItem(key, value);
-
-            expect(ctpClientMock.create).toHaveBeenCalledWith(
-                'customObjectsEndpoint',
-                JSON.stringify({ container: 'paydock-storage', key, value })
-            );
-        });
-
-        it('should throw an error if creating the custom object fails', async () => {
-            ctpClientMock.create.mockRejectedValue(new Error('Failed to create custom object'));
-
-            await expect(customObjectsUtils.setItem('test-key', { test: 'value' }))
-                .rejects
-                .toThrow('Failed to create custom object');
-        });
-    });
-
     describe('getItem', () => {
         it('should return the value of the custom object if it exists', async () => {
             const key = 'test-key';

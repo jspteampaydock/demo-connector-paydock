@@ -28,7 +28,7 @@ deployAs:
           required: true
   - name: extension
     applicationType: service
-    endpoint: /
+    endpoint: /extension
     scripts:
       postDeploy: npm install && npm run extension:post-deploy
       preUndeploy: npm install && npm run extension:pre-undeploy
@@ -51,16 +51,16 @@ deployAs:
         - key: COMMERCETOOLS_AUTH_URL
           description: The commercetolos auth url
           default: https://auth.europe-west1.gcp.commercetools.com
+          required: true
         - key: PAYDOCK_API_LIVE_URL
           description: Paydock api live url
+          required: true
         - key: PAYDOCK_API_SANDBOX_URL
           description: Paydock api sandbox url
-        - key: EXTENSION_BASE_URL
-          description: The extension URI path
-          required: false
+          required: true
   - name: notification
     applicationType: service
-    endpoint: /
+    endpoint: /notification
     scripts:
       postDeploy: npm install && npm run notification:post-deploy
       preUndeploy: npm install && npm run notification:pre-undeploy
@@ -83,10 +83,10 @@ deployAs:
         - key: COMMERCETOOLS_AUTH_URL
           description: The commercetolos auth url
           default: https://auth.europe-west1.gcp.commercetools.com
+          required: true
         - key: PAYDOCK_API_LIVE_URL
           description: Paydock api live url
+          required: true
         - key: PAYDOCK_API_SANDBOX_URL
           description: Paydock api sandbox url
-        - key: NOTIFICATION_BASE_URL
-          description: The notification URI path
-          required: false
+          required: true
