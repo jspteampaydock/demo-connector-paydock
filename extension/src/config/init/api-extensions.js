@@ -32,9 +32,6 @@ async function initApiExtensions(
           ctpPaydockIntegrationBaseUrl,
         }),
     )
-
-
-
     await utils.deleteElementByKeyIfExists(ctpClient, apiExtensionTemplate.key)
     await ctpClient.create(ctpClient.builder.extensions, extensionDraft)
     logger.info(

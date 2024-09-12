@@ -10,15 +10,17 @@ const logger = utils.getLogger()
 async function setupExtensionResources() {
   const moduleConfig = config.getModuleConfig()
   const ctpConfig = config.getExtensionConfig()
-  const ctpClient = await ctpClientBuilder.get(ctpConfig)
-  await Promise.all(
-      await initResources(
-          ctpClient,
-          ctpConfig.projectKey,
-          moduleConfig.apiExtensionBaseUrl,
-          generateBasicAuthorizationHeaderValue(),
-      )
-  )
+  if (moduleConfig.apiExtensionBaseUrl) {
+    const ctpClient = await ctpClientBuilder.get(ctpConfig)
+    await Promise.all(
+        await initResources(
+            ctpClient,
+            ctpConfig.projectKey,
+            moduleConfig.apiExtensionBaseUrl,
+            generateBasicAuthorizationHeaderValue(),
+        )
+    )  }
+
   logger.info(
       `Configured commercetools project keys are: ${JSON.stringify(
           ctpConfig,
