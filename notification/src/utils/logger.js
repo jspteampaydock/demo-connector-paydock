@@ -1,7 +1,7 @@
-import loggers  from '@commercetools-backend/loggers';
+import loggers from '@commercetools-backend/loggers';
 import config from '../config/config.js';
 
-const { createApplicationLogger } = loggers;
+const {createApplicationLogger} = loggers;
 
 let loggerInstance;
 
@@ -15,19 +15,34 @@ function getLogger() {
     return loggerInstance;
 }
 
-async function addPaydockLog(data) {
-    const logKey = `paydock-log_${Date.now()}`;
-    const logObject = {
-        container: "paydock-logs",
-        key: logKey,
-        value: data
-    };
+async function addPaydockLog(paymentId, version, data) {
+    const date = new Date();
+
+    const updateActions = [
+        {
+            "action": "addInterfaceInteraction",
+            "type": {
+                "key": "paydock-payment-log-iteraction"
+            },
+            "fields": {
+                "createdAt": date.toISOString(),
+                "chargeId": data.chargeId,
+                "operation": data.operation,
+                "status": data.status,
+                "message": data.message
+            }
+        }
+    ];
 
     const ctpClient = await config.getCtpClient();
-    await ctpClient.create(
-        ctpClient.builder.customObjects,
-        JSON.stringify(logObject)
+    const result = await ctpClient.update(
+        ctpClient.builder.payments,
+        paymentId.id,
+        version,
+        updateActions
     );
+
+    return result?.body?.version;
 }
 
-export { getLogger, addPaydockLog };
+export {getLogger, addPaydockLog};

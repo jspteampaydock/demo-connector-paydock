@@ -57,7 +57,8 @@ async function execute(paymentObject) {
         response.message = "Merchant refunded money"
         message = `Refunded ${requestBodyJson.refundAmount}`
     }
-    await httpUtils.addPaydockLog({
+
+    await httpUtils.addPaydockLog(paymentObject.id, {
         paydockChargeID: chargeId,
         operation: newStatus,
         responseStatus,

@@ -85,7 +85,7 @@ describe('Unit::update-payment-status.handler::execute', () => {
             c.STATUS_TYPES.PAID
         );
 
-        expect(httpUtils.addPaydockLog).toHaveBeenCalledWith({
+        expect(httpUtils.addPaydockLog).toHaveBeenCalledWith('order-123', {
             paydockChargeID: 'charge-123',
             operation: c.STATUS_TYPES.PAID,  // This matches the expected status
             responseStatus: 'Success',

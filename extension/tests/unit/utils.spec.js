@@ -1,4 +1,4 @@
-import {jest, expect} from "@jest/globals";
+import {expect, jest} from "@jest/globals";
 import utils from '../../src/utils.js';
 import config from '../../src/config/config.js';
 
@@ -37,32 +37,56 @@ describe('utils.js', () => {
             create: jest.fn(),
             fetchByKey: jest.fn(),
             delete: jest.fn(),
+            fetchById: jest.fn(() => ({
+                    body: {
+                        version: 1
+                    }
+                })),
             builder: {
                 customObjects: 'customObjectsEndpoint',
                 extensions: 'extensionsEndpoint',
+                payments: 'logUrl'
             },
+            update: jest.fn()
         };
         config.getCtpClient.mockResolvedValue(mockCtpClient);
     });
 
     test('addPaydockLog should log data to custom objects', async () => {
-        const data = { some: 'data' };
+        const data = {
+            paydockChargeID: 'paydockChargeIdId12334',
+            operation: 'test operation',
+            responseStatus: 'Success',
+            message: 'test message'
+        };
 
-        const mockTimestamp = 1724079438470;
-        jest.spyOn(Date, 'now').mockReturnValue(mockTimestamp);
+        const mockTimestamp = '1970-01-01T00:00:00.000Z';
+        jest.spyOn(Date.prototype, 'toISOString').mockReturnValue(mockTimestamp);
 
-        await utils.addPaydockLog(data);
+        await utils.addPaydockLog('01234567-89ab-cdef-0123-456789abcdef', data);
 
         expect(config.getCtpClient).toHaveBeenCalled();
-        expect(mockCtpClient.create).toHaveBeenCalledWith(
-            'customObjectsEndpoint',
-            JSON.stringify({
-                container: 'paydock-logs',
-                key: `paydock-log_${mockTimestamp}`,
-                value: data,
-            })
+        expect(mockCtpClient.fetchById).toHaveBeenCalled();
+        expect(mockCtpClient.update).toHaveBeenCalledWith(
+            'logUrl',
+            '01234567-89ab-cdef-0123-456789abcdef',
+            1,
+            [
+                {
+                    "action": "addInterfaceInteraction",
+                    "type": {
+                        "key": "paydock-payment-log-iteraction"
+                    },
+                    "fields": {
+                        "createdAt": mockTimestamp,
+                        "chargeId": data.paydockChargeID,
+                        "operation": data.operation,
+                        "status": data.status,
+                        "message": data.message
+                    }
+                }
+            ]
         );
-        Date.now.mockRestore();
     });
 
     test('collectRequestData should collect data from request stream', async () => {
@@ -87,24 +111,24 @@ describe('utils.js', () => {
             end: jest.fn(),
         };
 
-        const data = { some: 'data' };
+        const data = {some: 'data'};
         utils.sendResponse({
             response: mockResponse,
             statusCode: 200,
-            headers: { 'Content-Type': 'application/json' },
+            headers: {'Content-Type': 'application/json'},
             data,
         });
 
-        expect(mockResponse.writeHead).toHaveBeenCalledWith(200, { 'Content-Type': 'application/json' });
+        expect(mockResponse.writeHead).toHaveBeenCalledWith(200, {'Content-Type': 'application/json'});
         expect(mockResponse.end).toHaveBeenCalledWith(JSON.stringify(data));
     });
 
 
     test('deleteElementByKeyIfExists should delete element if exists', async () => {
         const key = 'extension-key';
-        const mockBody = { id: 'element-id', version: 1 };
+        const mockBody = {id: 'element-id', version: 1};
 
-        mockCtpClient.fetchByKey.mockResolvedValue({ body: mockBody });
+        mockCtpClient.fetchByKey.mockResolvedValue({body: mockBody});
 
         const result = await utils.deleteElementByKeyIfExists(mockCtpClient, key);
 
@@ -116,7 +140,7 @@ describe('utils.js', () => {
     test('deleteElementByKeyIfExists should return null if element does not exist', async () => {
         const key = 'non-existent-key';
 
-        mockCtpClient.fetchByKey.mockRejectedValue({ statusCode: 404 });
+        mockCtpClient.fetchByKey.mockRejectedValue({statusCode: 404});
 
         const result = await utils.deleteElementByKeyIfExists(mockCtpClient, key);
 

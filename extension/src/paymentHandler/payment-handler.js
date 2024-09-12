@@ -58,6 +58,7 @@ async function handlePaymentByExtRequest(paymentObject, authToken) {
             errors: validatePaymentErrors,
         }
     }
+
     const paymentCustomFields =  paymentObject?.custom?.fields;
     const paymentExtensionRequest = paymentCustomFields?.PaymentExtensionRequest ?? null;
     const additionalInformation = paymentCustomFields?.AdditionalInformation ?? null;

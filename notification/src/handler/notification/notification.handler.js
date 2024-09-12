@@ -62,13 +62,13 @@ async function processNotification(
 
 async function processWebhook(event, payment, notification, ctpClient) {
     const result = {}
-    const {status, paymentStatus, orderStatus} =  getNewStatuses(notification)
+    const {status, paymentStatus, orderStatus} = getNewStatuses(notification)
     let customStatus = status;
     const chargeId = notification._id
     const currentPayment = payment
-    const currentVersion = payment.version
+    let currentVersion = payment.version
     const updateActions = [];
-    if(status === 'paydock-paid'){
+    if (status === 'paydock-paid') {
         const capturedAmount = parseFloat(notification.transaction.amount) || 0
         const orderAmount = calculateOrderAmount(payment);
         customStatus = capturedAmount < orderAmount ? 'paydock-p-paid' : 'paydock-paid'
@@ -78,7 +78,7 @@ async function processWebhook(event, payment, notification, ctpClient) {
             value: capturedAmount
         })
     }
-    updateActions.push( {
+    updateActions.push({
         action: 'setCustomField',
         name: 'PaydockPaymentStatus',
         value: customStatus
@@ -98,7 +98,13 @@ async function processWebhook(event, payment, notification, ctpClient) {
     });
 
     try {
-        await ctpClient.update(ctpClient.builder.payments, currentPayment.id, currentVersion, updateActions)
+        const response = await ctpClient.update(
+            ctpClient.builder.payments,
+            currentPayment.id,
+            currentVersion,
+            updateActions
+        );
+        currentVersion = response?.body?.version;
         await updateOrderStatus(ctpClient, currentPayment.id, paymentStatus, orderStatus);
         result.status = 'Success'
     } catch (error) {
@@ -106,7 +112,7 @@ async function processWebhook(event, payment, notification, ctpClient) {
         result.message = error
     }
 
-    await addPaydockLog({
+    await addPaydockLog(currentPayment.id, currentVersion, {
         paydockChargeID: chargeId,
         operation,
         status: result.status,
@@ -174,7 +180,7 @@ async function processFraudNotificationComplete(event, payment, notification, ct
         result.status = 'UnfulfilledCondition'
         result.message = `Can't charge.${errorMessageToString(response)}`
 
-        await addPaydockLog({
+        await addPaydockLog(payment.id, payment.version, {
             paydockChargeID: updatedChargeId,
             operation: 'Charge',
             status: result.status,
@@ -184,14 +190,14 @@ async function processFraudNotificationComplete(event, payment, notification, ct
     }
 
     if (cacheData._3ds) {
-        const attachResponse =  await createCharge({
+        const attachResponse = await createCharge({
             fraud_charge_id: fraudChargeId
         }, {action: 'standalone-fraud-attach', updatedChargeId}, true)
         if (attachResponse?.error) {
             result.status = 'UnfulfilledCondition'
             result.message = `Can't fraud attach.${errorMessageToString(attachResponse)}`
 
-            await addPaydockLog({
+            await addPaydockLog(payment.id, payment.version, {
                 paydockChargeID: updatedChargeId,
                 operation: 'Fraud Attach',
                 status: result.status,
@@ -213,7 +219,7 @@ async function handleFraudNotification(response, updatedChargeId, ctpClient, pay
     let updateActions = [];
     const result = {}
     const currentPayment = payment
-    const currentVersion = payment.version
+    let currentVersion = payment.version
     let status = response?.resource?.data?.status
     status = status ? status.toLowerCase() : 'undefined'
     status = status.charAt(0).toUpperCase() + status.slice(1)
@@ -238,12 +244,18 @@ async function handleFraudNotification(response, updatedChargeId, ctpClient, pay
     ]
 
     try {
-        await ctpClient.update(ctpClient.builder.payments, currentPayment.id, currentVersion, updateActions)
+        const paymentResponse = await ctpClient.update(
+            ctpClient.builder.payments,
+            currentPayment.id,
+            currentVersion,
+            updateActions
+        )
+        currentVersion = paymentResponse?.body?.version
         await updateOrderStatus(ctpClient, currentPayment.id, commerceToolsPaymentStatus, 'Open');
 
         result.status = 'Success'
 
-        await addPaydockLog({
+        await addPaydockLog(currentPayment.id, currentVersion, {
             paydockChargeID: updatedChargeId,
             operation,
             status: result.status,
@@ -383,7 +395,7 @@ async function processRefundSuccessNotification(event, payment, notification, ct
     let paydockStatus
     const chargeId = notification._id
     const currentPayment = payment
-    const currentVersion = payment.version
+    let currentVersion = payment.version
 
     if (wasMerchantRefundedFromCommercetools(currentPayment)) {
         await ctpClient.update(ctpClient.builder.payments, currentPayment.id, currentVersion, [
@@ -440,7 +452,14 @@ async function processRefundSuccessNotification(event, payment, notification, ct
         ]
 
         try {
-            await ctpClient.update(ctpClient.builder.payments, currentPayment.id, currentVersion, updateActions)
+            const paymentResponse = await ctpClient.update(
+                ctpClient.builder.payments,
+                currentPayment.id,
+                currentVersion,
+                updateActions
+            )
+            currentVersion = paymentResponse?.body?.version
+
             await updateOrderStatus(ctpClient, currentPayment.id, 'Paid', 'Complete');
 
             result.status = 'Success'
@@ -450,7 +469,8 @@ async function processRefundSuccessNotification(event, payment, notification, ct
             result.message = error
         }
     }
-    await addPaydockLog({
+
+    await addPaydockLog(payment.id, currentVersion, {
         paydockChargeID: chargeId,
         operation: paydockStatus,
         status: result.status,
@@ -465,7 +485,7 @@ function calculateRefundedAmount(paydockStatus, oldRefundAmount, refundAmount, o
     return paydockStatus === 'paydock-refunded' ? orderAmount : oldRefundAmount + refundAmount;
 }
 
-function calculateOrderAmount(payment){
+function calculateOrderAmount(payment) {
     let fraction = 1;
     if (payment?.amountPlanned?.type === 'centPrecision') {
         fraction = 10 ** payment.amountPlanned.fractionDigits;
@@ -473,7 +493,7 @@ function calculateOrderAmount(payment){
     return payment.amountPlanned.centAmount / fraction;
 }
 
-function wasMerchantRefundedFromCommercetools(payment){
+function wasMerchantRefundedFromCommercetools(payment) {
     const prevResponse = payment?.custom?.fields?.PaymentExtensionResponse;
     return prevResponse && JSON.parse(prevResponse)?.message === 'Merchant refunded money';
 }
@@ -578,7 +598,7 @@ function getNewStatuses(notification) {
 function errorMessageToString(response) {
     let result = ` ${response.error?.message ?? ''}`;
     if (response.error?.details) {
-        const { details } = response.error;
+        const {details} = response.error;
         if (Array.isArray(details.messages) && details.messages.length > 0) {
             return details.messages[0];
         }
