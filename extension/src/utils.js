@@ -39,7 +39,7 @@ async function addPaydockLog(paymentId, data) {
         }
     ];
 
-    const paymentData = ctpClient.fetchById(ctpClient.builder.payments, paymentId);
+    const paymentData = await ctpClient.fetchById(ctpClient.builder.payments, paymentId);
     const version = paymentData.body.version;
 
     const result = await ctpClient.update(
