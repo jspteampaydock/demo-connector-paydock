@@ -7,7 +7,7 @@ const requiredEnvVars = [
   'COMMERCETOOLS_API_URL',
   'COMMERCETOOLS_AUTH_URL',
   'PAYDOCK_API_LIVE_URL',
-  'PAYDOCK_API_LIVE_URL'
+  'PAYDOCK_API_SANDBOX_URL'
 ];
 
 function loadConfig() {
