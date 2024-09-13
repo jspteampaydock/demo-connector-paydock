@@ -74,7 +74,6 @@ async function makePayment(makePaymentRequestObj, paymentId) {
 
 async function handlePaymentType(input, vaultToken, customerId, makePaymentRequestObj, paymentType, paymentSource, paymentId) {
     const configurations = await config.getPaydockConfig('connection');
-    const paymentType = makePaymentRequestObj.PaydockPaymentType;
     const amount = makePaymentRequestObj.amount.value;
     const currency = makePaymentRequestObj.amount.currency ?? 'AUD';
     try {
