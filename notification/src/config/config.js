@@ -76,8 +76,8 @@ async function getPaydockConfig(type = 'all') {
       "credentials_public_key",
       "credentials_secret_key"
     ].forEach((field)=>{
-      if(paydockConfig[group]?.value?.[field]){
-        paydockConfig[group].value[field] =  decrypt(paydockConfig[group]?.value?.[field])
+      if (paydockConfig[group]?.[field]) {
+        paydockConfig[group][field] = decrypt(paydockConfig[group][field], config.clientSecret)
       }
     }))
   }

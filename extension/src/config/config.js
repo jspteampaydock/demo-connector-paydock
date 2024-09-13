@@ -6,8 +6,9 @@ let paydockConfig;
 let ctpClient;
 
 function getExtensionUrl() {
-    return  process.env.CONNECT_SERVICE_URL;
+    return process.env.CONNECT_SERVICE_URL;
 }
+
 function decrypt(data, clientSecret) {
     const keyArrayLen = clientSecret.length;
 
@@ -17,6 +18,7 @@ function decrypt(data, clientSecret) {
         return String.fromCharCode(dataElement.charCodeAt(0) / clientSecret.charCodeAt(remainder))
     }).join("");
 }
+
 function getModuleConfig() {
     return {
         removeSensitiveData: true,
@@ -37,6 +39,7 @@ async function getCtpClient() {
     }
     return ctpClient;
 }
+
 async function getPaydockApiUrl() {
     const paydockC = await getPaydockConfig('connection');
     return paydockC.api_url;
@@ -73,13 +76,13 @@ async function getPaydockConfig(type = 'all', disableCache = false) {
                 paydockConfig[element.key] = element.value;
             });
         }
-        ["live","sandbox"].forEach((group) => [
+        ["live", "sandbox"].forEach((group) => [
             "credentials_access_key",
             "credentials_public_key",
             "credentials_secret_key"
-        ].forEach((field)=>{
-            if(paydockConfig[group]?.value?.[field]){
-                paydockConfig[group].value[field] =  decrypt(paydockConfig[group]?.value?.[field])
+        ].forEach((field) => {
+            if (paydockConfig[group]?.[field]) {
+                paydockConfig[group][field] = decrypt(paydockConfig[group][field], config.clientSecret)
             }
         }))
     }
@@ -89,7 +92,7 @@ async function getPaydockConfig(type = 'all', disableCache = false) {
                 paydockConfig['sandbox'].api_url = config.paydockSandboxUrl
                 return paydockConfig['sandbox'] ?? {};
             }
-            paydockConfig['live'].api_url =  config.paydockLiveUrl;
+            paydockConfig['live'].api_url = config.paydockLiveUrl;
             return paydockConfig['live'] ?? {};
 
         case 'widget:':
