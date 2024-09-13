@@ -11,10 +11,7 @@ const logger = httpUtils.getLogger();
 
 async function makePayment(makePaymentRequestObj, paymentId) {
     const orderId = makePaymentRequestObj.orderId;
-    const paymentSource = makePaymentRequestObj.PaydockTransactionId;
     const paymentType = makePaymentRequestObj.PaydockPaymentType;
-    const amount = makePaymentRequestObj.amount.value;
-    const currency = makePaymentRequestObj.amount.currency ?? 'AUD';
     const input = makePaymentRequestObj;
     const additionalInformation = input.AdditionalInfo ?? {};
     if (additionalInformation) {
@@ -54,7 +51,7 @@ async function makePayment(makePaymentRequestObj, paymentId) {
         customerId = await getCustomerIdByVaultToken(input.CommerceToolsUserId, vaultToken);
     }
 
-    response = await handlePaymentType(input, configurations, vaultToken, customerId, amount, currency, paymentType, paymentSource, paymentId);
+    response = await handlePaymentType(input, configurations, vaultToken, customerId, makePaymentRequestObj, paymentType, paymentSource, paymentId);
 
     if (response) {
         status = response.status;
@@ -75,8 +72,11 @@ async function makePayment(makePaymentRequestObj, paymentId) {
     return response;
 }
 
-async function handlePaymentType(input, configurations, vaultToken, customerId, amount, currency, paymentType, paymentSource, paymentId) {
-
+async function handlePaymentType(input, vaultToken, customerId, makePaymentRequestObj, paymentType, paymentSource, paymentId) {
+    const configurations = await config.getPaydockConfig('connection');
+    const paymentType = makePaymentRequestObj.PaydockPaymentType;
+    const amount = makePaymentRequestObj.amount.value;
+    const currency = makePaymentRequestObj.amount.currency ?? 'AUD';
     try {
         switch (paymentType) {
             case 'card':
