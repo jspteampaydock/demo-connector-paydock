@@ -22,7 +22,7 @@ async function addPaydockLog(paymentId, version, data) {
         {
             "action": "addInterfaceInteraction",
             "type": {
-                "key": "paydock-payment-log-iteraction"
+                "key": "paydock-payment-log-interaction"
             },
             "fields": {
                 "createdAt": date.toISOString(),
