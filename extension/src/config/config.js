@@ -8,7 +8,15 @@ let ctpClient;
 function getExtensionUrl() {
     return  process.env.CONNECT_SERVICE_URL;
 }
+function decrypt(data, clientSecret) {
+    const keyArrayLen = clientSecret.length;
 
+    return data.split("").map((dataElement, index) => {
+        const remainder = index % keyArrayLen;
+
+        return String.fromCharCode(dataElement.charCodeAt(0) / clientSecret.charCodeAt(remainder))
+    }).join("");
+}
 function getModuleConfig() {
     return {
         removeSensitiveData: true,
@@ -65,6 +73,15 @@ async function getPaydockConfig(type = 'all', disableCache = false) {
                 paydockConfig[element.key] = element.value;
             });
         }
+        ["live","sandbox"].forEach((group) => [
+            "credentials_access_key",
+            "credentials_public_key",
+            "credentials_secret_key"
+        ].forEach((field)=>{
+            if(paydockConfig[group]?.value?.[field]){
+                paydockConfig[group].value[field] =  decrypt(paydockConfig[group]?.value?.[field])
+            }
+        }))
     }
     switch (type) {
         case 'connection':
