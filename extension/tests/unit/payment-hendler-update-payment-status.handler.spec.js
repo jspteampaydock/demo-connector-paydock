@@ -48,6 +48,7 @@ describe('Unit::update-payment-status.handler::execute', () => {
 
         paymentObject = {
             id: 'order-123',
+            version:2,
             custom: {
                 fields: {
                     PaymentExtensionRequest: JSON.stringify(paymentExtensionRequest),
@@ -85,7 +86,7 @@ describe('Unit::update-payment-status.handler::execute', () => {
             c.STATUS_TYPES.PAID
         );
 
-        expect(httpUtils.addPaydockLog).toHaveBeenCalledWith('order-123', {
+        expect(httpUtils.addPaydockLog).toHaveBeenCalledWith(paymentObject, {
             paydockChargeID: 'charge-123',
             operation: c.STATUS_TYPES.PAID,  // This matches the expected status
             responseStatus: 'Success',

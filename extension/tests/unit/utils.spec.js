@@ -38,10 +38,10 @@ describe('utils.js', () => {
             fetchByKey: jest.fn(),
             delete: jest.fn(),
             fetchById: jest.fn(() => ({
-                    body: {
-                        version: 1
-                    }
-                })),
+                body: {
+                    version: 1
+                }
+            })),
             builder: {
                 customObjects: 'customObjectsEndpoint',
                 extensions: 'extensionsEndpoint',
@@ -63,14 +63,13 @@ describe('utils.js', () => {
         const mockTimestamp = '1970-01-01T00:00:00.000Z';
         jest.spyOn(Date.prototype, 'toISOString').mockReturnValue(mockTimestamp);
 
-        await utils.addPaydockLog('01234567-89ab-cdef-0123-456789abcdef', data);
+        await utils.addPaydockLog({id: '01234567-89ab-cdef-0123-456789abcdef', version: 2}, data);
 
         expect(config.getCtpClient).toHaveBeenCalled();
-        expect(mockCtpClient.fetchById).toHaveBeenCalled();
         expect(mockCtpClient.update).toHaveBeenCalledWith(
             'logUrl',
             '01234567-89ab-cdef-0123-456789abcdef',
-            1,
+            2,
             [
                 {
                     "action": "addInterfaceInteraction",
