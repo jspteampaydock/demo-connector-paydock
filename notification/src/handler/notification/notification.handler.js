@@ -63,12 +63,13 @@ async function processNotification(
 async function processWebhook(event, payment, notification, ctpClient) {
     const result = {}
     const {status, paymentStatus, orderStatus} = getNewStatuses(notification)
+    const oldStatus = payment.custom.fields.PaydockPaymentStatus;
     let customStatus = status;
     const chargeId = notification._id
     const currentPayment = payment
     let currentVersion = payment.version
     const updateActions = [];
-    if(paymentStatus === orderStatus){
+    if(status === oldStatus){
         return result;
     }
     if (status === 'paydock-paid') {
