@@ -68,6 +68,9 @@ async function processWebhook(event, payment, notification, ctpClient) {
     const currentPayment = payment
     let currentVersion = payment.version
     const updateActions = [];
+    if(paymentStatus === orderStatus){
+        return result;
+    }
     if (status === 'paydock-paid') {
         const capturedAmount = parseFloat(notification.transaction.amount) || 0
         const orderAmount = calculateOrderAmount(payment);
