@@ -19,7 +19,7 @@ function getLogger() {
     return loggerInstance;
 }
 
-async function addPaydockLog(paymentId, data) {
+async function addPaydockLog(paymentObject, data) {
     const date = new Date();
     const ctpClient = await config.getCtpClient();
 
@@ -39,17 +39,18 @@ async function addPaydockLog(paymentId, data) {
         }
     ];
 
-    const paymentData = await ctpClient.fetchById(ctpClient.builder.payments, paymentId);
+    const paymentData = await ctpClient.fetchById(ctpClient.builder.payments, paymentObject.id);
     const version = paymentData.body.version;
 
     const result = await ctpClient.update(
         ctpClient.builder.payments,
-        paymentId,
+        paymentObject.id,
         version,
         updateActions
     );
-
-    return result?.body?.version;
+    if(result?.body?.version){
+        paymentObject.version = result?.body?.version;
+    }
 }
 
 function collectRequestData(request) {

@@ -9,11 +9,11 @@ import {updateOrderPaymentState} from './ct-api-service.js';
 
 const logger = httpUtils.getLogger();
 
-async function makePayment(makePaymentRequestObj, paymentId) {
+async function makePayment(makePaymentRequestObj, paymentObject) {
     const orderId = makePaymentRequestObj.orderId;
+    const paymentSource = makePaymentRequestObj.PaydockTransactionId;
     const paymentType = makePaymentRequestObj.PaydockPaymentType;
     const input = makePaymentRequestObj;
-    const paymentSource = makePaymentRequestObj.PaydockTransactionId;
     const additionalInformation = input.AdditionalInfo ?? {};
     if (additionalInformation) {
         Object.assign(input, additionalInformation);
@@ -52,7 +52,7 @@ async function makePayment(makePaymentRequestObj, paymentId) {
         customerId = await getCustomerIdByVaultToken(input.CommerceToolsUserId, vaultToken);
     }
 
-    response = await handlePaymentType(input, vaultToken, customerId, makePaymentRequestObj, paymentType, paymentSource, paymentId);
+    response = await handlePaymentType(input, configurations, vaultToken, customerId, makePaymentRequestObj, paymentType, paymentSource, paymentObject);
 
     if (response) {
         status = response.status;
@@ -63,7 +63,7 @@ async function makePayment(makePaymentRequestObj, paymentId) {
 
     await updateOrderPaymentState(orderId, paydockStatus);
 
-    await httpUtils.addPaydockLog(paymentId, {
+    await httpUtils.addPaydockLog(paymentObject, {
         paydockChargeID: chargeId,
         operation: paydockStatus,
         status,
@@ -73,7 +73,7 @@ async function makePayment(makePaymentRequestObj, paymentId) {
     return response;
 }
 
-async function handlePaymentType(input, vaultToken, customerId, makePaymentRequestObj, paymentType, paymentSource, paymentId) {
+async function handlePaymentType(input, vaultToken, customerId, makePaymentRequestObj, paymentType, paymentSource, paymentObject) {
     const configurations = await config.getPaydockConfig('connection');
     const amount = makePaymentRequestObj.amount.value;
     const currency = makePaymentRequestObj.amount.currency ?? 'AUD';
@@ -89,7 +89,7 @@ async function handlePaymentType(input, vaultToken, customerId, makePaymentReque
                         currency,
                         vaultToken,
                         customerId,
-                        paymentId
+                        paymentObject
                     });
                 }
                 break;
@@ -102,7 +102,7 @@ async function handlePaymentType(input, vaultToken, customerId, makePaymentReque
                     currency,
                     paymentSource,
                     paymentType,
-                    paymentId
+                    paymentObject
                 });
             case 'PayPal Smart':
             case 'Google Pay':
@@ -189,7 +189,7 @@ async function createStandalone3dsToken(data) {
 }
 
 
-async function cardFlow({configurations, input, amount, currency, vaultToken, customerId, paymentId}) {
+async function cardFlow({configurations, input, amount, currency, vaultToken, customerId, paymentObject}) {
     let result;
     switch (true) {
         case (configurations.card_card_save === 'Enable' && !!customerId):
@@ -202,7 +202,7 @@ async function cardFlow({configurations, input, amount, currency, vaultToken, cu
                 currency,
                 vaultToken,
                 customerId,
-                paymentId
+                paymentObject
             });
             break;
         case (
@@ -216,7 +216,7 @@ async function cardFlow({configurations, input, amount, currency, vaultToken, cu
                 currency,
                 vaultToken,
                 customerId,
-                paymentId
+                paymentObject
             });
             break;
         case (configurations.card_3ds === 'Standalone 3DS' || configurations.card_3ds === 'In-built 3DS'):
@@ -227,7 +227,7 @@ async function cardFlow({configurations, input, amount, currency, vaultToken, cu
                 currency,
                 vaultToken,
                 customerId,
-                paymentId
+                paymentObject
             });
             break;
         case (configurations.card_fraud === 'Standalone Fraud' || configurations.card_fraud === 'In-built Fraud'):
@@ -238,7 +238,7 @@ async function cardFlow({configurations, input, amount, currency, vaultToken, cu
                 currency,
                 vaultToken,
                 customerId,
-                paymentId
+                paymentObject
             });
             break;
         case (configurations.card_card_save === 'Enable' && configurations.card_card_method_save === 'Vault token' && input.SaveCard): {
@@ -248,11 +248,11 @@ async function cardFlow({configurations, input, amount, currency, vaultToken, cu
                 user_id: input.CommerceToolsUserId,
                 customer_id: customerId,
             });
-            result = await cardCharge({configurations, input, amount, currency, vaultToken, paymentId});
+            result = await cardCharge({configurations, input, amount, currency, vaultToken});
         }
             break;
         default:
-            result = await cardCharge({configurations, input, amount, currency, vaultToken, paymentId});
+            result = await cardCharge({configurations, input, amount, currency, vaultToken});
     }
 
     return result;
@@ -265,7 +265,7 @@ async function cardFraud3DsCharge({
                                       currency,
                                       vaultToken,
                                       customerId,
-                                      paymentId
+                                      paymentObject
                                   }) {
     let result;
     switch (true) {
@@ -313,7 +313,7 @@ async function cardFraud3DsCharge({
             input,
             vaultToken,
             type: 'card',
-            paymentId
+            paymentObject
         })
     }
 
@@ -557,7 +557,7 @@ async function cardFraudInBuild3DsStandaloneCharge({configurations, input, amoun
     return result;
 }
 
-async function card3DsCharge({configurations, input, amount, currency, vaultToken, customerId}) {
+async function card3DsCharge({configurations, input, amount, currency, vaultToken, customerId, paymentObject}) {
     let result;
     if (configurations.card_3ds === 'In-built 3DS') {
         result = await card3DsInBuildCharge({configurations, input, amount, currency, vaultToken});
@@ -573,7 +573,8 @@ async function card3DsCharge({configurations, input, amount, currency, vaultToke
             configurations,
             input,
             vaultToken,
-            type: 'card'
+            type: 'card',
+            paymentObject
         })
     }
     const isDirectCharge = configurations.card_direct_charge === 'Enable';
@@ -679,7 +680,8 @@ async function cardFraudCharge({
                                    amount,
                                    currency,
                                    vaultToken,
-                                   customerId
+                                   customerId,
+                                   paymentObject
                                }) {
     let result;
     if (configurations.card_fraud === 'In-built Fraud') {
@@ -702,7 +704,8 @@ async function cardFraudCharge({
             configurations,
             input,
             vaultToken,
-            type: 'card'
+            type: 'card',
+            paymentObject
         })
     }
 
@@ -841,7 +844,7 @@ async function cardCustomerCharge({
                                       currency,
                                       vaultToken,
                                       customerId,
-                                      paymentId
+                                      paymentObject
                                   }) {
     if (!customerId) {
         customerId = await createCustomerAndSaveVaultToken({
@@ -849,7 +852,7 @@ async function cardCustomerCharge({
             input,
             vaultToken,
             type: 'card',
-            paymentId
+            paymentObject
         });
     }
 
@@ -1002,14 +1005,14 @@ function generateCustomerRequest(input, vaultToken, type, configurations) {
     return customerRequest;
 }
 
-async function createCustomerAndSaveVaultToken({configurations, input, vaultToken, type, paymentId}) {
+async function createCustomerAndSaveVaultToken({configurations, input, vaultToken, type, paymentObject}) {
     let customerId = null;
     const customerRequest = generateCustomerRequest(input, vaultToken, type, configurations);
     const customerResponse = await createCustomer(customerRequest);
     if (customerResponse.status === 'Success' && customerResponse.customerId) {
         customerId = customerResponse.customerId;
 
-        await httpUtils.addPaydockLog(paymentId, {
+        await httpUtils.addPaydockLog(paymentObject, {
             paydockChargeID: input.PaydockTransactionId,
             operation: 'Create Customer',
             status: customerResponse.status,
@@ -1032,7 +1035,7 @@ async function createCustomerAndSaveVaultToken({configurations, input, vaultToke
             });
             const messageLog = result.success ? 'Customer Vault Token saved successfully' : result.error
             const statusLog = result.success ? 'Success' : 'Failure'
-            await httpUtils.addPaydockLog(paymentId, {
+            await httpUtils.addPaydockLog(paymentObject, {
                 paydockChargeID: input.PaydockTransactionId,
                 operation: 'Save Customer Vault Token',
                 status: statusLog,
@@ -1040,7 +1043,7 @@ async function createCustomerAndSaveVaultToken({configurations, input, vaultToke
             })
         }
     } else {
-        await httpUtils.addPaydockLog(paymentId, {
+        await httpUtils.addPaydockLog(paymentObject, {
             paydockChargeID: input.PaydockTransactionId,
             operation: 'Create Customer',
             status: customerResponse.status,
