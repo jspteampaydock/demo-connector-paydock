@@ -52,7 +52,7 @@ async function makePayment(makePaymentRequestObj, paymentObject) {
         customerId = await getCustomerIdByVaultToken(input.CommerceToolsUserId, vaultToken);
     }
 
-    response = await handlePaymentType(input, configurations, vaultToken, customerId, makePaymentRequestObj, paymentType, paymentSource, paymentObject);
+    response = await handlePaymentType(input, vaultToken, customerId, makePaymentRequestObj, paymentType, paymentSource, paymentObject);
 
     if (response) {
         status = response.status;
