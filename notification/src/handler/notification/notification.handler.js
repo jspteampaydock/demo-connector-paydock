@@ -4,7 +4,7 @@ import config from '../../config/config.js'
 import {addPaydockLog} from '../../utils/logger.js'
 import ctp from '../../utils/ctp.js'
 import customObjectsUtils from '../../utils/custom-objects-utils.js'
-import {callPaydock} from './paydock-api-service.js';
+import {addPaydockHttpLog, callPaydock} from './paydock-api-service.js';
 
 async function processNotification(
     notificationResponse
@@ -22,11 +22,11 @@ async function processNotification(
     } else {
         const paymentKey = notification.reference
         const paymentObject = await getPaymentByMerchantReference(ctpClient, paymentKey)
-
         if (!paymentObject) {
             result.status = 'Failure'
             result.message = 'Payment not found'
         } else if (event !== undefined) {
+            addPaydockHttpLog(notificationResponse)
             switch (event) {
                 case 'transaction_success':
                 case 'transaction_failure':
