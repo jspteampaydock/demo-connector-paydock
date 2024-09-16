@@ -25,7 +25,7 @@ async function execute(paymentObject) {
         'getVaultTokenResponse',
         'PaymentExtensionRequest'
     ];
-    const [response] = await Promise.all([makePayment(makePaymentRequestObj,paymentObject.id)])
+    const [response] = await Promise.all([makePayment(makePaymentRequestObj,paymentObject)])
     if (response.status === 'Failure') {
         const errorMessage = response.message ?? "Invalid transaction details"
         actions.push(createSetCustomFieldAction(c.CTP_INTERACTION_PAYMENT_EXTENSION_RESPONSE, JSON.stringify({
