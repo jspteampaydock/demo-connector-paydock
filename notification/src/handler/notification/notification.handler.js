@@ -112,7 +112,7 @@ async function processWebhook(event, payment, notification, ctpClient) {
         result.message = error
     }
 
-    await addPaydockLog(currentPayment.id, currentVersion, {
+    payment.version = await addPaydockLog(currentPayment.id, currentVersion, {
         paydockChargeID: chargeId,
         operation,
         status: result.status,
@@ -180,7 +180,7 @@ async function processFraudNotificationComplete(event, payment, notification, ct
         result.status = 'UnfulfilledCondition'
         result.message = `Can't charge.${errorMessageToString(response)}`
 
-        await addPaydockLog(payment.id, payment.version, {
+        payment.version = await addPaydockLog(payment.id, payment.version, {
             paydockChargeID: updatedChargeId,
             operation: 'Charge',
             status: result.status,
@@ -197,7 +197,7 @@ async function processFraudNotificationComplete(event, payment, notification, ct
             result.status = 'UnfulfilledCondition'
             result.message = `Can't fraud attach.${errorMessageToString(attachResponse)}`
 
-            await addPaydockLog(payment.id, payment.version, {
+            payment.version = await addPaydockLog(payment.id, payment.version, {
                 paydockChargeID: updatedChargeId,
                 operation: 'Fraud Attach',
                 status: result.status,
@@ -255,7 +255,7 @@ async function handleFraudNotification(response, updatedChargeId, ctpClient, pay
 
         result.status = 'Success'
 
-        await addPaydockLog(currentPayment.id, currentVersion, {
+        payment.version = await addPaydockLog(currentPayment.id, currentVersion, {
             paydockChargeID: updatedChargeId,
             operation,
             status: result.status,
@@ -470,7 +470,7 @@ async function processRefundSuccessNotification(event, payment, notification, ct
         }
     }
 
-    await addPaydockLog(payment.id, currentVersion, {
+    payment.version = await addPaydockLog(payment.id, currentVersion, {
         paydockChargeID: chargeId,
         operation: paydockStatus,
         status: result.status,
