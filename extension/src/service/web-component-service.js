@@ -13,6 +13,7 @@ async function makePayment(makePaymentRequestObj, paymentId) {
     const orderId = makePaymentRequestObj.orderId;
     const paymentType = makePaymentRequestObj.PaydockPaymentType;
     const input = makePaymentRequestObj;
+    const paymentSource = makePaymentRequestObj.PaydockTransactionId;
     const additionalInformation = input.AdditionalInfo ?? {};
     if (additionalInformation) {
         Object.assign(input, additionalInformation);
@@ -51,7 +52,7 @@ async function makePayment(makePaymentRequestObj, paymentId) {
         customerId = await getCustomerIdByVaultToken(input.CommerceToolsUserId, vaultToken);
     }
 
-    response = await handlePaymentType(input, configurations, vaultToken, customerId, makePaymentRequestObj, paymentType, paymentSource, paymentId);
+    response = await handlePaymentType(input, vaultToken, customerId, makePaymentRequestObj, paymentType, paymentSource, paymentId);
 
     if (response) {
         status = response.status;
