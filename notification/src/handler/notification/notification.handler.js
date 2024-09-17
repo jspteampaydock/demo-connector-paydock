@@ -4,7 +4,7 @@ import config from '../../config/config.js'
 import {addPaydockLog, getLogActions} from '../../utils/logger.js'
 import ctp from '../../utils/ctp.js'
 import customObjectsUtils from '../../utils/custom-objects-utils.js'
-import {callPaydock} from './paydock-api-service.js';
+import {addPaydockHttpLog, callPaydock} from './paydock-api-service.js';
 
 async function processNotification(
     notificationResponse
@@ -22,11 +22,11 @@ async function processNotification(
     } else {
         const paymentKey = notification.reference
         const paymentObject = await getPaymentByMerchantReference(ctpClient, paymentKey)
-
         if (!paymentObject) {
             result.status = 'Failure'
             result.message = 'Payment not found'
         } else if (event !== undefined) {
+            addPaydockHttpLog(notificationResponse)
             switch (event) {
                 case 'transaction_success':
                 case 'transaction_failure':
@@ -63,11 +63,15 @@ async function processNotification(
 async function processWebhook(event, payment, notification, ctpClient) {
     const result = {}
     const {status, paymentStatus, orderStatus} = getNewStatuses(notification)
+    const oldStatus = payment.custom.fields.PaydockPaymentStatus;
     let customStatus = status;
     const chargeId = notification._id
     const currentPayment = payment
     let currentVersion = payment.version
     const updateActions = [];
+    if(status === oldStatus){
+        return result;
+    }
     if (status === 'paydock-paid') {
         const capturedAmount = parseFloat(notification.transaction.amount) || 0
         const orderAmount = calculateOrderAmount(payment);

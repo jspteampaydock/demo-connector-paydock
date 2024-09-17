@@ -6,6 +6,7 @@ The Paydock Payment Connector enables seamless integration between your commerce
 
 ![Live Connection](docs/paydock-connector.png)
 
+
 ### Modules
 
 1. **Extension Module**  
