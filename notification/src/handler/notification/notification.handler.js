@@ -58,21 +58,13 @@ async function processNotification(
             const logs = getLogActions();
 
             if (logs.length) {
-                try {
-                    paymentObject = await ctpClient.fetchById(ctpClient.builder.payments, paymentObject.id);
-                    let response = await ctpClient.update(
-                        ctpClient.builder.payments,
-                        paymentObject.body.id,
-                        paymentObject.body.version,
-                        logs
-                    );
-
-                    let a = 1;
-                } catch (e) {
-
-
-                    let b = 1;
-                }
+                paymentObject = await ctpClient.fetchById(ctpClient.builder.payments, paymentObject.id);
+                await ctpClient.update(
+                    ctpClient.builder.payments,
+                    paymentObject.body.id,
+                    paymentObject.body.version,
+                    logs
+                );
             }
         }
     }
@@ -90,9 +82,9 @@ async function processWebhook(event, payment, notification, ctpClient) {
     const currentVersion = payment.version
     const updateActions = [];
 
-    // if(status === oldStatus){
-    //     return result;
-    // }
+    if(status === oldStatus){
+        return result;
+    }
     if (status === 'paydock-paid') {
         const capturedAmount = parseFloat(notification.transaction.amount) || 0
         const orderAmount = calculateOrderAmount(payment);
@@ -138,7 +130,7 @@ async function processWebhook(event, payment, notification, ctpClient) {
     }
 
     addPaydockLog({
-        paydockChargeID: notification.id,
+        paydockChargeID: chargeId,
         operation,
         status: result.status,
         message: result.message ?? ''
