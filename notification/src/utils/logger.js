@@ -31,7 +31,7 @@ function addPaydockLog(data) {
         },
         "fields": {
             "createdAt": date.toISOString(),
-            "chargeId": data.chargeId,
+            "chargeId": data.paydockChargeID,
             "operation": data.operation,
             "status": data.status,
             "message": message

@@ -492,7 +492,7 @@ async function processRefundSuccessNotification(event, payment, notification, ct
     }
 
     addPaydockLog({
-        paydockChargeID: notification.id,
+        paydockChargeID: chargeId,
         operation: paydockStatus,
         status: result.status,
         message: result.message ?? ''
