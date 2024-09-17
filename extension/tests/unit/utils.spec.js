@@ -63,36 +63,30 @@ describe('utils.js', () => {
         const mockTimestamp = '1970-01-01T00:00:00.000Z';
         jest.spyOn(Date.prototype, 'toISOString').mockReturnValue(mockTimestamp);
 
-        await utils.addPaydockLog({id: '01234567-89ab-cdef-0123-456789abcdef', version: 2}, data);
+        utils.addPaydockLog(data);
 
-        expect(config.getCtpClient).toHaveBeenCalled();
-        expect(mockCtpClient.update).toHaveBeenCalledWith(
-            'logUrl',
-            '01234567-89ab-cdef-0123-456789abcdef',
-            2,
-            [
-                {
-                    "action": "addInterfaceInteraction",
-                    "type": {
-                        "key": "paydock-payment-log-interaction"
-                    },
-                    "fields": {
-                        "createdAt": mockTimestamp,
-                        "chargeId": data.paydockChargeID,
-                        "operation": data.operation,
-                        "status": data.status,
-                        "message": data.message
-                    }
+        expect(utils.getLogsAction()).toEqual([
+            {
+                "action": "addInterfaceInteraction",
+                "type": {
+                    "key": "paydock-payment-log-interaction"
+                },
+                "fields": {
+                    "createdAt": mockTimestamp,
+                    "chargeId": data.paydockChargeID,
+                    "operation": data.operation,
+                    "status": data.status,
+                    "message": data.message
                 }
-            ]
-        );
+            }
+        ]);
     });
 
     test('collectRequestData should collect data from request stream', async () => {
         const mockRequest = {
             on: jest.fn((event, callback) => {
                 if (event === 'data') {
-                    callback(Buffer.from('test data'));
+                    callback(Buffer.from('{"message": "test data"}'));
                 }
                 if (event === 'end') {
                     callback();
@@ -101,7 +95,7 @@ describe('utils.js', () => {
         };
 
         const data = await utils.collectRequestData(mockRequest);
-        expect(data).toBe('test data');
+        expect(data).toBe('{"message": "test data"}');
     });
 
     test('sendResponse should send correct response', () => {

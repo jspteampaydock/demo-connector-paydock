@@ -4,6 +4,7 @@ import config from '../config/config.js';
 const {createApplicationLogger} = loggers;
 
 let loggerInstance;
+let logActions = [];
 
 function getLogger() {
     if (!loggerInstance) {
@@ -15,34 +16,34 @@ function getLogger() {
     return loggerInstance;
 }
 
-async function addPaydockLog(paymentId, version, data) {
+function addPaydockLog(data) {
     const date = new Date();
-
-    const updateActions = [
-        {
-            "action": "addInterfaceInteraction",
-            "type": {
-                "key": "paydock-payment-log-interaction"
-            },
-            "fields": {
-                "createdAt": date.toISOString(),
-                "chargeId": data.chargeId,
-                "operation": data.operation,
-                "status": data.status,
-                "message": data.message
-            }
+    let message = '';
+    if (typeof data.message === 'string'){
+        message = data.message
+    }else{
+        message = data?.message?.message ?? ''
+    }
+    logActions.push({
+        "action": "addInterfaceInteraction",
+        "type": {
+            "key": "paydock-payment-log-interaction"
+        },
+        "fields": {
+            "createdAt": date.toISOString(),
+            "chargeId": data.paydockChargeID,
+            "operation": data.operation,
+            "status": data.status,
+            "message": message
         }
-    ];
-
-    const ctpClient = await config.getCtpClient();
-    const result = await ctpClient.update(
-        ctpClient.builder.payments,
-        paymentId.id,
-        version,
-        updateActions
-    );
-
-    return result?.body?.version;
+    })
 }
 
-export {getLogger, addPaydockLog};
+function getLogActions(){
+    const result = logActions
+    logActions = [];
+
+    return result;
+}
+
+export {getLogger, addPaydockLog, getLogActions};

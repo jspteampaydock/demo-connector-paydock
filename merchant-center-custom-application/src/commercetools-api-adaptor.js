@@ -151,7 +151,7 @@ class CommerceToolsAPIAdapter {
 
     async getLogs() {
         let logs = [];
-        let paydockLogs = await this.makeRequest('/payments/?&sort=createdAt+desc');
+        let paydockLogs = await this.makeRequest('/payments/?&sort=createdAt+desc&limit=500');
         if (paydockLogs.results) {
             paydockLogs.results.forEach((paydockLog) => {
                 paydockLog.interfaceInteractions.forEach((interactionLog) => {
@@ -166,7 +166,13 @@ class CommerceToolsAPIAdapter {
                 })
             });
         }
-        return logs;
+
+        return logs.sort((first, second) => {
+            const date1 = Date.parse(first.date);
+            const date2 = Date.parse(second.date);
+
+            return date2 - date1
+        })
     }
 
 

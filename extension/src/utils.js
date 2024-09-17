@@ -8,6 +8,7 @@ import config from './config/config.js';
 const {createApplicationLogger} = loggers;
 
 let loggerInstance;
+const logActions = [];
 
 function getLogger() {
     if (!loggerInstance) {
@@ -19,35 +20,22 @@ function getLogger() {
     return loggerInstance;
 }
 
-async function addPaydockLog(paymentObject, data) {
+function addPaydockLog(data) {
     const date = new Date();
-    const ctpClient = await config.getCtpClient();
 
-    const updateActions = [
-        {
-            "action": "addInterfaceInteraction",
-            "type": {
-                "key": "paydock-payment-log-interaction"
-            },
-            "fields": {
-                "createdAt": date.toISOString(),
-                "chargeId": data.paydockChargeID,
-                "operation": data.operation,
-                "status": data.status,
-                "message": data.message
-            }
+    logActions.push({
+        "action": "addInterfaceInteraction",
+        "type": {
+            "key": "paydock-payment-log-interaction"
+        },
+        "fields": {
+            "createdAt": date.toISOString(),
+            "chargeId": data.paydockChargeID,
+            "operation": data.operation,
+            "status": data.status,
+            "message": data.message
         }
-    ];
-
-    const result = await ctpClient.update(
-        ctpClient.builder.payments,
-        paymentObject.id,
-        paymentObject.version,
-        updateActions
-    );
-    if(result?.body?.version){
-        paymentObject.version = result?.body?.version;
-    }
+    })
 }
 
 async function addPaydockHttpLog(data) {
@@ -127,10 +115,15 @@ async function deleteElementByKeyIfExists(ctpClient, key) {
     }
 }
 
+function getLogsAction(){
+    return logActions;
+}
+
 export default {
     collectRequestData,
     sendResponse,
     getLogger,
+    getLogsAction,
     handleUnexpectedPaymentError,
     readAndParseJsonFile,
     addPaydockLog,
