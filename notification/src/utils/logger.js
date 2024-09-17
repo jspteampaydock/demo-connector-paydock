@@ -18,7 +18,12 @@ function getLogger() {
 
 function addPaydockLog(data) {
     const date = new Date();
-
+    let message = '';
+    if (typeof data.message === 'string'){
+        message = data.message
+    }else{
+        message = data?.message?.message ?? ''
+    }
     logActions.push({
         "action": "addInterfaceInteraction",
         "type": {
@@ -29,7 +34,7 @@ function addPaydockLog(data) {
             "chargeId": data.chargeId,
             "operation": data.operation,
             "status": data.status,
-            "message": data.message
+            "message": message
         }
     })
 }

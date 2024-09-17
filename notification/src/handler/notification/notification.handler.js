@@ -21,7 +21,7 @@ async function processNotification(
         result.message = 'Reference not found'
     } else {
         const paymentKey = notification.reference
-        const paymentObject = await getPaymentByMerchantReference(ctpClient, paymentKey)
+        let paymentObject = await getPaymentByMerchantReference(ctpClient, paymentKey)
         if (!paymentObject) {
             result.status = 'Failure'
             result.message = 'Payment not found'
@@ -54,6 +54,26 @@ async function processNotification(
                     result.status = 'Failure'
                     result.message = 'Notification Event not found'
             }
+
+            const logs = getLogActions();
+
+            if (logs.length) {
+                try {
+                    paymentObject = await ctpClient.fetchById(ctpClient.builder.payments, paymentObject.id);
+                    let response = await ctpClient.update(
+                        ctpClient.builder.payments,
+                        paymentObject.body.id,
+                        paymentObject.body.version,
+                        logs
+                    );
+
+                    let a = 1;
+                } catch (e) {
+
+
+                    let b = 1;
+                }
+            }
         }
     }
 
@@ -70,9 +90,9 @@ async function processWebhook(event, payment, notification, ctpClient) {
     const currentVersion = payment.version
     const updateActions = [];
 
-    if(status === oldStatus){
-        return result;
-    }
+    // if(status === oldStatus){
+    //     return result;
+    // }
     if (status === 'paydock-paid') {
         const capturedAmount = parseFloat(notification.transaction.amount) || 0
         const orderAmount = calculateOrderAmount(payment);
@@ -103,13 +123,6 @@ async function processWebhook(event, payment, notification, ctpClient) {
     });
 
     try {
-        addPaydockLog({
-            paydockChargeID: chargeId,
-            operation,
-            status: result.status,
-            message: result.message ?? ''
-        })
-
         await ctpClient.update(
             ctpClient.builder.payments,
             currentPayment.id,
@@ -123,6 +136,14 @@ async function processWebhook(event, payment, notification, ctpClient) {
         result.status = 'Failure'
         result.message = error
     }
+
+    addPaydockLog({
+        paydockChargeID: notification.id,
+        operation,
+        status: result.status,
+        message: result.message ?? ''
+    })
+
     return result
 }
 
@@ -229,7 +250,7 @@ async function handleFraudNotification(response, updatedChargeId, ctpClient, pay
     let updateActions = [];
     const result = {}
     const currentPayment = payment
-    let currentVersion = payment.version
+    const currentVersion = payment.version
     let status = response?.resource?.data?.status
     status = status ? status.toLowerCase() : 'undefined'
     status = status.charAt(0).toUpperCase() + status.slice(1)
@@ -254,13 +275,12 @@ async function handleFraudNotification(response, updatedChargeId, ctpClient, pay
     ]
 
     try {
-        const paymentResponse = await ctpClient.update(
+        await ctpClient.update(
             ctpClient.builder.payments,
             currentPayment.id,
             currentVersion,
             updateActions
         )
-        currentVersion = paymentResponse?.body?.version
         await updateOrderStatus(ctpClient, currentPayment.id, commerceToolsPaymentStatus, 'Open');
 
         result.status = 'Success'
