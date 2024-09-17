@@ -35,7 +35,10 @@ function addPaydockLog(data) {
 }
 
 function getLogActions(){
-    return logActions;
+    const result = logActions
+    logActions = [];
+
+    return result;
 }
 
 export {getLogger, addPaydockLog, getLogActions};

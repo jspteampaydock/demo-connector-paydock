@@ -1,9 +1,10 @@
-import {jest, expect} from "@jest/globals";
+import {expect, jest} from "@jest/globals";
 
 import notificationHandler from '../../src/handler/notification/notification.handler.js';
 import customObjectsUtils from '../../src/utils/custom-objects-utils.js';
 
 import ctp from '../../src/utils/ctp.js';
+import {getLogActions} from "../../src/utils/logger.js";
 
 const request = require('supertest');
 const {setupServer} = require("../../src/server.js");
@@ -16,9 +17,30 @@ const dataSuccess = require('../../test-data/handler/notification/transaction-su
 const paymentObject = require('../../test-data/handler/notification/payment-object.json');
 
 const dataUnknownEvent = {notification: {reference: 'payment-key'}, event: 'unknown_event'};
+const testLog = {
+    action: 'addInterfaceInteraction',
+    fields: {
+        chargeId: 'testChargeId',
+        createdAt: '2024-09-17T07:52:39.605Z',
+        message: 'test message',
+        operation: 'Fraud',
+        status: 'testStatus',
+    },
+    type: {
+        key: "paydock-payment-log-interaction"
+    }
+}
 
 jest.mock('../../src/utils/ctp.js');
 jest.mock('../../src/config/config-loader.js');
+jest.mock('../../src/utils/logger.js', () => {
+    const originalModule = jest.requireActual('../../src/utils/logger.js');
+    return {
+        __esModule: true,
+        ...originalModule,
+        getLogActions: jest.fn(() => [testLog]),
+    };
+});
 jest.mock('../../src/utils/custom-objects-utils.js', () => ({
     setItem: jest.fn(),
     getItem: jest.fn(),
@@ -36,7 +58,8 @@ jest.mock('@commercetools-backend/loggers', () => {
     };
 });
 jest.mock('../../src/handler/notification/paydock-api-service.js', () => ({
-    callPaydock: jest.fn()
+    callPaydock: jest.fn(),
+    addPaydockHttpLog: jest.fn()
 }));
 
 jest.mock('../../src/config/config-loader.js', () => {
@@ -142,7 +165,12 @@ describe('processNotification', () => {
                 fetchById: jest.fn(() => ({
                     body: {
                         id: "12345678-9abc-def0-1234-56789abcdef0",
-                        version: 3
+                        version: 3,
+                        custom: {
+                            fields: {
+                                PaydockPaymentStatus: 'test'
+                            }
+                        }
                     }
                 })),
                 update: jest.fn(),
@@ -167,7 +195,8 @@ describe('processNotification', () => {
                         action: 'FromNotification',
                         request: {}
                     })
-                }
+                },
+                testLog
             ];
 
             ctp.get.mockResolvedValue(ctpClient);

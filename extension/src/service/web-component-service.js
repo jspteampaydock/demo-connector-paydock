@@ -63,7 +63,7 @@ async function makePayment(makePaymentRequestObj, paymentObject) {
 
     await updateOrderPaymentState(orderId, paydockStatus);
 
-    await httpUtils.addPaydockLog(paymentObject, {
+    httpUtils.addPaydockLog({
         paydockChargeID: chargeId,
         operation: paydockStatus,
         status,
@@ -1012,7 +1012,7 @@ async function createCustomerAndSaveVaultToken({configurations, input, vaultToke
     if (customerResponse.status === 'Success' && customerResponse.customerId) {
         customerId = customerResponse.customerId;
 
-        await httpUtils.addPaydockLog(paymentObject, {
+        httpUtils.addPaydockLog({
             paydockChargeID: input.PaydockTransactionId,
             operation: 'Create Customer',
             status: customerResponse.status,
@@ -1035,7 +1035,7 @@ async function createCustomerAndSaveVaultToken({configurations, input, vaultToke
             });
             const messageLog = result.success ? 'Customer Vault Token saved successfully' : result.error
             const statusLog = result.success ? 'Success' : 'Failure'
-            await httpUtils.addPaydockLog(paymentObject, {
+            httpUtils.addPaydockLog({
                 paydockChargeID: input.PaydockTransactionId,
                 operation: 'Save Customer Vault Token',
                 status: statusLog,
@@ -1043,7 +1043,7 @@ async function createCustomerAndSaveVaultToken({configurations, input, vaultToke
             })
         }
     } else {
-        await httpUtils.addPaydockLog(paymentObject, {
+        httpUtils.addPaydockLog({
             paydockChargeID: input.PaydockTransactionId,
             operation: 'Create Customer',
             status: customerResponse.status,

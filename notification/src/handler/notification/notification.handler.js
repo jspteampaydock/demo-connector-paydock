@@ -67,8 +67,9 @@ async function processWebhook(event, payment, notification, ctpClient) {
     let customStatus = status;
     const chargeId = notification._id
     const currentPayment = payment
-    let currentVersion = payment.version
+    const currentVersion = payment.version
     const updateActions = [];
+
     if(status === oldStatus){
         return result;
     }
@@ -102,26 +103,26 @@ async function processWebhook(event, payment, notification, ctpClient) {
     });
 
     try {
-        const response = await ctpClient.update(
+        addPaydockLog({
+            paydockChargeID: chargeId,
+            operation,
+            status: result.status,
+            message: result.message ?? ''
+        })
+
+        await ctpClient.update(
             ctpClient.builder.payments,
             currentPayment.id,
             currentVersion,
             updateActions.concat(getLogActions())
         );
-        currentVersion = response?.body?.version;
+
         await updateOrderStatus(ctpClient, currentPayment.id, paymentStatus, orderStatus);
         result.status = 'Success'
     } catch (error) {
         result.status = 'Failure'
         result.message = error
     }
-
-    addPaydockLog({
-        paydockChargeID: chargeId,
-        operation,
-        status: result.status,
-        message: result.message ?? ''
-    })
     return result
 }
 
