@@ -1183,7 +1183,8 @@ async function getCustomerIdByVaultToken(user_id, vault_token) {
 
         return customerId;
     } catch (error) {
-        return customerId;
+        logger.error(`Error in getCustomerIdByVaultToken: ${JSON.stringify(serializeError(error))}`);
+        throw error
     }
 }
 

@@ -7,9 +7,8 @@ import c from '../config/constants.js'
 import {makePayment} from '../service/web-component-service.js'
 
 async function execute(paymentObject) {
-    const makePaymentRequestObj = JSON.parse(
-        paymentObject.custom.fields.makePaymentRequest,
-    )
+    const paymentExtensionRequest = JSON.parse(paymentObject.custom.fields.PaymentExtensionRequest)
+    const makePaymentRequestObj = paymentExtensionRequest?.request
     let capturedAmount = paymentObject.amountPlanned.centAmount;
     if (paymentObject.amountPlanned.type === 'centPrecision') {
         const fraction = 10 ** paymentObject.amountPlanned.fractionDigits;
@@ -19,10 +18,6 @@ async function execute(paymentObject) {
     let paymentActions = [];
     let actions = []
     const customFieldsToDelete = [
-        'makePaymentRequest',
-        'makePaymentResponse',
-        'getVaultTokenRequest',
-        'getVaultTokenResponse',
         'PaymentExtensionRequest'
     ];
     const [response] = await Promise.all([makePayment(makePaymentRequestObj,paymentObject)])
@@ -37,9 +32,8 @@ async function execute(paymentObject) {
             actions: paymentActions
         };
     }
-    const requestBodyJson = JSON.parse(paymentObject?.custom?.fields?.makePaymentRequest);
-    const paydockStatus = response?.paydockStatus ?? requestBodyJson?.PaydockPaymentStatus;
-    actions = generateActionsFromResponse(actions, response, requestBodyJson, capturedAmount, paymentObject, paydockStatus);
+    const paydockStatus = response?.paydockStatus ?? makePaymentRequestObj?.PaydockPaymentStatus;
+    actions = generateActionsFromResponse(actions, response, makePaymentRequestObj, capturedAmount, paymentObject, paydockStatus);
 
     if (paydockStatus) {
         const {orderState, orderPaymentState} = getCommercetoolsStatusesByPaydockStatus(paydockStatus);

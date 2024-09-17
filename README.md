@@ -109,13 +109,7 @@ The default commercetools payment type does not include all the necessary fields
 | `CommerceToolsUserId`           | Commerce tools user ID            | String    | SingleLine    | ID of the user in commercetools                                         |
 | `SaveCard`                      | Save Card                         | Boolean   | SingleLine    | Indicates whether to save the card for future transactions              |
 | `VaultToken`                    | Vault token                       | String    | SingleLine    | Vault payment token representing user’s payment information             |
-| `AdditionalInformation`         | Additional information            | String    | MultiLine     | Any additional information relevant to the payment                      |
-| `getVaultTokenRequest`          | Vault token request               | String    | MultiLine     | Request for generating a vault token                                    |
-| `getStandalone3dsTokenRequest`  | Standalone 3DS token request      | String    | MultiLine     | Request for generating a 3DS token                                      |
-| `getStandalone3dsTokenResponse` | Standalone 3DS Token Response     | String    | MultiLine     | Response from Paydock after generating a 3DS token                      |
-| `getVaultTokenResponse`         | Vault token response              | String    | MultiLine     | Response after generating a vault token                                 |
-| `makePaymentRequest`            | Payment request                   | String    | MultiLine     | Data sent to Paydock to make a payment                                  |
-| `makePaymentResponse`           | Payment response                  | String    | MultiLine     | Response from Paydock after attempting a payment                        |
+| `AdditionalInformation`         | Additional information            | String    | MultiLine     | Any additional information relevant to the payment                      | |
 | `RefundedAmount`                | Refunded amount                   | Number    | SingleLine    | The amount refunded via Paydock                                         |
 | `CapturedAmount`                | Captured amount                   | Number    | SingleLine    | The amount captured from the transaction                                |
 | `PaymentExtensionRequest`       | Payment extension request         | String    | MultiLine     | Request for generating various operations associated with the payment, such as updating status, retrieving payment methods, and other actions. |

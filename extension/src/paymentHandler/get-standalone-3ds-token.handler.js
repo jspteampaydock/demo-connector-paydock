@@ -5,17 +5,14 @@ import c from '../config/constants.js'
 import {createStandalone3dsToken} from '../service/web-component-service.js'
 
 async function execute(paymentObject) {
-    const getStandalone3dsTokenRequestObj = JSON.parse(
-        paymentObject.custom.fields.getStandalone3dsTokenRequest,
-    )
-    const requestBodyJson = JSON.parse(paymentObject?.custom?.fields?.getStandalone3dsTokenRequest);
-    const response = await createStandalone3dsToken(requestBodyJson)
+    const paymentExtensionRequest = JSON.parse(paymentObject.custom.fields.PaymentExtensionRequest)
+    const response = await createStandalone3dsToken(paymentExtensionRequest?.request)
     if (response.status === 'Failure') {
         return {
             actions: [
                 {
-                    action: "getStandalone3dsToken",
-                    transactionId: getStandalone3dsTokenRequestObj.transactionId,
+                    action: c.CTP_INTERACTION_PAYMENT_EXTENSION_REQUEST,
+                    transactionId: paymentExtensionRequest.transactionId,
                     state: "Failure"
                 }
             ]
@@ -24,7 +21,7 @@ async function execute(paymentObject) {
 
     const actions = []
 
-    actions.push(createSetCustomFieldAction(c.CTP_CUSTOM_FIELD_GET_STANDALONE_3DS_TOKEN_RESPONSE, response));
+    actions.push(createSetCustomFieldAction(c.CTP_INTERACTION_PAYMENT_EXTENSION_RESPONSE, response));
     return {
         actions,
     }

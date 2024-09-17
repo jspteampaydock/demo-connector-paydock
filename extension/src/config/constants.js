@@ -6,6 +6,7 @@ export default {
     CTP_CUSTOM_FIELD_GET_VAULT_TOKEN_RESPONSE: 'getVaultTokenResponse',
     CTP_CUSTOM_FIELD_MAKE_PRE_CHARGE_RESPONSE: 'makePreChargeResponse',
     CTP_CUSTOM_FIELD_GET_STANDALONE_3DS_TOKEN_RESPONSE: 'getStandalone3dsTokenResponse',
+    CTP_CUSTOM_FIELD_GET_STANDALONE_3DS_TOKEN_REQUEST: 'getStandalone3dsTokenRequest',
     CTP_CUSTOM_FIELD_PAYDOCK_PAYMENT_STATUS: 'PaydockPaymentStatus',
     CTP_CUSTOM_FIELD_REFUNDED_AMOUNT: 'RefundedAmount',
     CTP_CUSTOM_FIELD_PAYDOCK_TRANSACTION_ID: 'PaydockTransactionId',

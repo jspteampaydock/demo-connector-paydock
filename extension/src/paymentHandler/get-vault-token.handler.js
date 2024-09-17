@@ -5,18 +5,14 @@ import c from '../config/constants.js'
 import {getVaultToken} from '../service/web-component-service.js'
 
 async function execute(paymentObject) {
-    const getVaultTokenRequestObj = JSON.parse(
-        paymentObject.custom.fields.getVaultTokenRequest,
-    )
-
-    const requestBodyJson = JSON.parse(paymentObject?.custom?.fields?.getVaultTokenRequest);
-    const response = await getVaultToken(requestBodyJson)
+    const paymentExtensionRequest = JSON.parse(paymentObject.custom.fields.PaymentExtensionRequest)
+    const response = await getVaultToken(paymentExtensionRequest?.request)
     if (response.status === 'Failure') {
         return {
             actions: [
                 {
-                    action: "getVaultToken",
-                    transactionId: getVaultTokenRequestObj.transactionId,
+                    action: c.CTP_INTERACTION_PAYMENT_EXTENSION_REQUEST,
+                    transactionId: paymentExtensionRequest.transactionId,
                     state: "Failure"
                 }
             ]
@@ -25,7 +21,7 @@ async function execute(paymentObject) {
 
     const actions = []
 
-    actions.push(createSetCustomFieldAction(c.CTP_CUSTOM_FIELD_GET_VAULT_TOKEN_RESPONSE, response));
+    actions.push(createSetCustomFieldAction(c.CTP_INTERACTION_PAYMENT_EXTENSION_RESPONSE, response));
     return {
         actions,
     }

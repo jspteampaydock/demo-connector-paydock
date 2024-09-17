@@ -47,11 +47,11 @@ describe('Integration::PaymentHandler::getStandalone3dsToken::', () => {
         const paymentObject = {
             custom: {
                 fields: {
-                    getStandalone3dsTokenRequest: JSON.stringify({
-                        transactionId: 'transaction-123',
+                    PaymentExtensionRequest: JSON.stringify({
+                        action: "getStandalone3dsTokenRequest",
                         request: {
                             data: 'some-request-data'
-                        }
+                        },
                     })
                 }
             }
@@ -69,7 +69,7 @@ describe('Integration::PaymentHandler::getStandalone3dsToken::', () => {
 
         expect(result).toHaveProperty('actions');
         expect(result.actions[0]).toHaveProperty('action', 'setCustomField');
-        expect(result.actions[0]).toHaveProperty('name', 'getStandalone3dsTokenResponse');
+        expect(result.actions[0]).toHaveProperty('name', 'PaymentExtensionResponse');
         expect(result.actions[0]).toHaveProperty('value', JSON.stringify(mockResponse));
     });
 
@@ -77,11 +77,11 @@ describe('Integration::PaymentHandler::getStandalone3dsToken::', () => {
         const paymentObject = {
             custom: {
                 fields: {
-                    getStandalone3dsTokenRequest: JSON.stringify({
-                        transactionId: 'transaction-123',
+                    PaymentExtensionRequest: JSON.stringify({
+                        action: "getStandalone3dsTokenRequest",
                         request: {
                             data: 'some-request-data'
-                        }
+                        },
                     })
                 }
             }
@@ -97,8 +97,7 @@ describe('Integration::PaymentHandler::getStandalone3dsToken::', () => {
         const result = await getStandalone3dsTokenHandler.execute(paymentObject);
 
         expect(result).toHaveProperty('actions');
-        expect(result.actions[0]).toHaveProperty('action', 'getStandalone3dsToken');
-        expect(result.actions[0]).toHaveProperty('transactionId', 'transaction-123');
+        expect(result.actions[0]).toHaveProperty('action', 'PaymentExtensionRequest');
         expect(result.actions[0]).toHaveProperty('state', 'Failure');
     });
 });

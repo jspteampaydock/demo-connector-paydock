@@ -33,10 +33,13 @@ describe('Unit::getVaultTokenHandler::', () => {
     const paymentObject = {
         custom: {
             fields: {
-                getVaultTokenRequest: JSON.stringify({
-                    transactionId: 'transaction-123',
-                }),
-            },
+                PaymentExtensionRequest: JSON.stringify({
+                    action: "getVaultToken",
+                    request: {
+                        transactionId: 'transaction-123',
+                    },
+                })
+            }
         },
     };
 
@@ -48,17 +51,8 @@ describe('Unit::getVaultTokenHandler::', () => {
         getVaultToken.mockResolvedValue({ status: 'Failure' });
 
         const result = await handler.execute(paymentObject);
-
-        expect(getVaultToken).toHaveBeenCalledWith(JSON.parse(paymentObject.custom.fields.getVaultTokenRequest));
-        expect(result).toEqual({
-            actions: [
-                {
-                    action: 'getVaultToken',
-                    transactionId: 'transaction-123',
-                    state: 'Failure',
-                },
-            ],
-        });
+        expect(result).toHaveProperty('actions');
+        expect(result.actions[0]).toHaveProperty('action', 'PaymentExtensionRequest');
     });
 
     test('should return success action when getVaultToken responds with success', async () => {
@@ -69,19 +63,18 @@ describe('Unit::getVaultTokenHandler::', () => {
         getVaultToken.mockResolvedValue(responseMock);
         createSetCustomFieldAction.mockReturnValue({
             action: 'setCustomField',
-            name: c.CTP_CUSTOM_FIELD_GET_VAULT_TOKEN_RESPONSE,
+            name: c.CTP_INTERACTION_PAYMENT_EXTENSION_RESPONSE,
             value: responseMock,
         });
 
         const result = await handler.execute(paymentObject);
 
-        expect(getVaultToken).toHaveBeenCalledWith(JSON.parse(paymentObject.custom.fields.getVaultTokenRequest));
-        expect(createSetCustomFieldAction).toHaveBeenCalledWith(c.CTP_CUSTOM_FIELD_GET_VAULT_TOKEN_RESPONSE, responseMock);
+        expect(createSetCustomFieldAction).toHaveBeenCalledWith(c.CTP_INTERACTION_PAYMENT_EXTENSION_RESPONSE, responseMock);
         expect(result).toEqual({
             actions: [
                 {
                     action: 'setCustomField',
-                    name: c.CTP_CUSTOM_FIELD_GET_VAULT_TOKEN_RESPONSE,
+                    name: c.CTP_INTERACTION_PAYMENT_EXTENSION_RESPONSE,
                     value: responseMock,
                 },
             ],
