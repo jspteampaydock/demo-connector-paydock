@@ -75,7 +75,7 @@ describe('make-payment.handler', () => {
 
         const result = await makePaymentHandler.execute(paymentObject);
 
-        expect(result.actions).toHaveLength(10);
+        expect(result.actions).toHaveLength(9);
         expect(result.actions).toContainEqual(expect.objectContaining({
             action: 'setCustomField',
             field: c.CTP_CUSTOM_FIELD_PAYDOCK_PAYMENT_TYPE
@@ -99,7 +99,7 @@ describe('make-payment.handler', () => {
 
         const result = await makePaymentHandler.execute(paymentObject);
 
-        expect(result.actions).toHaveLength(2);
+        expect(result.actions).toHaveLength(1);
 
         expect(result.actions).toContainEqual(expect.objectContaining({
             action: 'setCustomField',

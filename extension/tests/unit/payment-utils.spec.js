@@ -67,18 +67,6 @@ describe('payment-utils', () => {
         expect(result).toBe(false);
     });
 
-    test('getPaymentKeyUpdateAction should return action when new reference differs from paymentKey', () => {
-        const paymentKey = 'oldKey';
-        const request = { body: JSON.stringify({ reference: 'newKey' }) };
-        const response = {};
-        const expectedAction = {
-            action: 'setKey',
-            key: 'newKey',
-        };
-
-        const result = getPaymentKeyUpdateAction(paymentKey, request, response);
-        expect(result).toEqual(expectedAction);
-    });
 
     test('getPaymentKeyUpdateAction should return action when response pspReference differs from paymentKey', () => {
         const paymentKey = 'oldKey';

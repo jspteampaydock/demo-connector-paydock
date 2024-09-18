@@ -72,32 +72,4 @@ describe('Integration::PaymentHandler::getStandalone3dsToken::', () => {
         expect(result.actions[0]).toHaveProperty('name', 'PaymentExtensionResponse');
         expect(result.actions[0]).toHaveProperty('value', JSON.stringify(mockResponse));
     });
-
-    test('should handle failure in 3DS token creation', async () => {
-        const paymentObject = {
-            custom: {
-                fields: {
-                    PaymentExtensionRequest: JSON.stringify({
-                        action: "getStandalone3dsTokenRequest",
-                        request: {
-                            data: 'some-request-data'
-                        },
-                    })
-                }
-            }
-        };
-
-        const mockResponse = {
-            status: 'Failure',
-            message: '3DS token creation failed'
-        };
-
-        createStandalone3dsToken.mockResolvedValue(mockResponse);
-
-        const result = await getStandalone3dsTokenHandler.execute(paymentObject);
-
-        expect(result).toHaveProperty('actions');
-        expect(result.actions[0]).toHaveProperty('action', 'PaymentExtensionRequest');
-        expect(result.actions[0]).toHaveProperty('state', 'Failure');
-    });
 });

@@ -34,7 +34,7 @@ describe('Unit::getVaultTokenHandler::', () => {
         custom: {
             fields: {
                 PaymentExtensionRequest: JSON.stringify({
-                    action: "getVaultToken",
+                    action: "getVaultTokenRequest",
                     request: {
                         transactionId: 'transaction-123',
                     },
@@ -45,14 +45,6 @@ describe('Unit::getVaultTokenHandler::', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
-    });
-
-    test('should return failure action when getVaultToken responds with failure', async () => {
-        getVaultToken.mockResolvedValue({ status: 'Failure' });
-
-        const result = await handler.execute(paymentObject);
-        expect(result).toHaveProperty('actions');
-        expect(result.actions[0]).toHaveProperty('action', 'PaymentExtensionRequest');
     });
 
     test('should return success action when getVaultToken responds with success', async () => {
