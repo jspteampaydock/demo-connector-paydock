@@ -1,7 +1,7 @@
 import {
     createSetCustomFieldAction,
     createAddTransactionActionByResponse,
-    getPaymentKeyUpdateAction, deleteCustomFieldAction,
+    getPaymentKeyUpdateAction,
 } from './payment-utils.js'
 import c from '../config/constants.js'
 import {makePayment} from '../service/web-component-service.js'
@@ -16,11 +16,7 @@ async function execute(paymentObject) {
         capturedAmount = paymentObject.amountPlanned.centAmount / fraction;
         makePaymentRequestObj.amount.value = capturedAmount;
     }
-    let paymentActions = [];
     let actions = []
-    const customFieldsToDelete = [
-        'PaymentExtensionRequest'
-    ];
     const [response] = await Promise.all([makePayment(makePaymentRequestObj,paymentObject)])
     if (response.status === 'Failure') {
         const errorMessage = response.message ?? "Invalid transaction details"
@@ -28,9 +24,8 @@ async function execute(paymentObject) {
             status: "Failure",
             message: errorMessage
         })));
-        paymentActions = await deleteCustomFields(actions, paymentObject, customFieldsToDelete);
         return {
-            actions: paymentActions
+            actions
         };
     }
     const paydockStatus = response?.paydockStatus ?? makePaymentRequestObj?.PaydockPaymentStatus;
@@ -46,12 +41,9 @@ async function execute(paymentObject) {
         if (paydockStatus === c.STATUS_TYPES.PAID) {
             actions.push(createSetCustomFieldAction('CapturedAmount', capturedAmount));
         }
-    } else {
-        customFieldsToDelete.push(c.CTP_INTERACTION_PAYMENT_EXTENSION_RESPONSE)
     }
-    paymentActions = await deleteCustomFields(actions, paymentObject, customFieldsToDelete)
     return {
-        actions: paymentActions
+        actions
     }
 }
 
@@ -119,18 +111,6 @@ function getCommercetoolsStatusesByPaydockStatus(paydockStatus) {
     }
 
     return {orderState, orderPaymentState}
-}
-
-async function deleteCustomFields(actions, paymentObject, customFieldsToDelete) {
-    const customFields = paymentObject?.custom?.fields;
-    if (customFields) {
-        customFieldsToDelete.forEach(field => {
-            if (typeof customFields[field] !== 'undefined' && customFields[field]) {
-                actions.push(deleteCustomFieldAction(field));
-            }
-        });
-    }
-    return actions
 }
 
 export default {execute}
