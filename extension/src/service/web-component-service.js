@@ -62,7 +62,6 @@ async function makePayment(makePaymentRequestObj, paymentObject) {
     }
 
     await updateOrderPaymentState(orderId, paydockStatus);
-
     httpUtils.addPaydockLog({
         paydockChargeID: chargeId,
         operation: paydockStatus,
