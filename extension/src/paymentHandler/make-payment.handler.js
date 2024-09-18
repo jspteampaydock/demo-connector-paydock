@@ -7,6 +7,7 @@ import c from '../config/constants.js'
 import {makePayment} from '../service/web-component-service.js'
 
 async function execute(paymentObject) {
+
     const paymentExtensionRequest = JSON.parse(paymentObject.custom.fields.PaymentExtensionRequest)
     const makePaymentRequestObj = paymentExtensionRequest?.request
     let capturedAmount = paymentObject.amountPlanned.centAmount;
@@ -77,7 +78,9 @@ function generateActionsFromResponse(actions, response, requestBodyJson, capture
     if (additionalInfo) {
         actions.push(createSetCustomFieldAction(c.CTP_CUSTOM_FIELD_ADDITIONAL_INFORMATION, JSON.stringify(additionalInfo)));
     }
-    const updatePaymentAction = getPaymentKeyUpdateAction(paymentObject.key, {body: paymentObject.custom.fields.makePaymentRequest}, response);
+    const paymentExtensionRequest = JSON.parse(paymentObject.custom.fields.PaymentExtensionRequest)
+    const makePaymentRequestObj = paymentExtensionRequest?.request
+    const updatePaymentAction = getPaymentKeyUpdateAction(paymentObject.key, makePaymentRequestObj, response);
     if (updatePaymentAction) actions.push(updatePaymentAction);
 
     const addTransactionAction = createAddTransactionActionByResponse(paymentObject.amountPlanned.centAmount, paymentObject.amountPlanned.currencyCode, response);

@@ -63,9 +63,9 @@ function collectRequestData(request) {
 
         request.on('end', () => {
             const dataStr = Buffer.concat(data).toString();
-            if(dataStr){
-                this.addPaydockHttpLog(JSON.parse(dataStr));
-            }
+            //if(dataStr){
+               // this.addPaydockHttpLog(JSON.parse(dataStr));
+            //}
             resolve(dataStr);
         });
     });

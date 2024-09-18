@@ -33,15 +33,14 @@ async function handlePaymentByExtRequest(paymentObject, authToken) {
     const actionExtension = objPaymentExtensionRequest.action ?? null;
     const handlers = [];
     if (!actionExtension || (actionExtension === 'FromNotification')) return null
-
     switch (actionExtension) {
         case  c.CTP_CUSTOM_FIELD_GET_PAYMENT_METHODS_REQUEST:
             handlers.push(getPaymentMethodsHandler)
             break;
-        case  c.CTP_INTERACTION_TYPE_GET_VAULT_TOKEN:
+        case  c.CTP_INTERACTION_TYPE_GET_VAULT_TOKEN_REQUEST:
             handlers.push(getVaultTokenHandler)
             break;
-        case c.CTP_INTERACTION_TYPE_MAKE_PAYMENT:
+        case c.CTP_INTERACTION_TYPE_MAKE_PAYMENT_REQUEST:
             handlers.push(makePaymentHandler)
             break;
         case c.CTP_CUSTOM_FIELD_GET_STANDALONE_3DS_TOKEN_REQUEST:
