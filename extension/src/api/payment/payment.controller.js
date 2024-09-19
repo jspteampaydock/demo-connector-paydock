@@ -14,7 +14,7 @@ async function processRequest(request, response) {
                 errors: [
                     {
                         code: 'InvalidInput',
-                        message: 'Invalid HTTP method 12',
+                        message: 'Invalid HTTP method',
                     },
                 ],
             },
