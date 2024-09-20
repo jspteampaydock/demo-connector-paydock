@@ -24,20 +24,13 @@ async function processRequest(request, response) {
     try {
         const authToken = getAuthorizationRequestHeader(request)
         paymentObject = await _getPaymentObject(request)
-
-        const paymentExtensionRequest = paymentObject?.custom?.fields?.PaymentExtensionRequest ?? null;
-        if (paymentExtensionRequest === null) {
-            return httpUtils.sendResponse({response, statusCode: 200, data: {actions: []}})
-        }
         const paymentResult = await paymentHandler.handlePaymentByExtRequest(
             paymentObject,
             authToken,
         )
-
         if (paymentResult === null) {
             return httpUtils.sendResponse({response, statusCode: 200, data: {actions: []}})
         }
-
         if (paymentResult.actions) {
             paymentResult.actions = paymentResult.actions.concat(httpUtils.getLogsAction())
         }
@@ -65,7 +58,7 @@ async function _getPaymentObject(request) {
     let body = {}
     try {
         body = await httpUtils.collectRequestData(request)
-        const requestBody = JSON.parse(body)
+       const requestBody = JSON.parse(body)
         return requestBody.resource.obj
     } catch (err) {
         const errorStackTrace =
