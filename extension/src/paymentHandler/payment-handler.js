@@ -67,8 +67,6 @@ async function handlePaymentByExtRequest(paymentObject, authToken) {
     const version = handlerResponses.find((result) => result.version !== null)
     const actions = handlerResponses.flatMap((result) => result.actions)
     actions.push(deleteCustomFieldAction(c.CTP_INTERACTION_PAYMENT_EXTENSION_REQUEST))
-
-    await utils.addPaydockHttpLog(actions);
     if (version) {
         return {
             actions,

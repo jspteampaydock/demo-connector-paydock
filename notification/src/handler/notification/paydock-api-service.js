@@ -2,20 +2,6 @@ import fetch from 'node-fetch'
 import {serializeError} from 'serialize-error'
 import config from '../../config/config.js'
 
-async function addPaydockHttpLog(data) {
-    const logKey = `paydock-notification-http_${Date.now()}`;
-
-    const logObject = {
-        container: "paydock-notification-http-logs",
-        key: logKey,
-        value: data
-    };
-    const ctpClient = await config.getCtpClient()
-    ctpClient.create(
-        ctpClient.builder.customObjects,
-        JSON.stringify(logObject)
-    )
-}
 
 
 async function callPaydock(url, data, method) {
@@ -88,6 +74,5 @@ async function buildRequestPaydock(requestObj, methodOverride) {
 
 
 export {
-    callPaydock,
-    addPaydockHttpLog
+    callPaydock
 }

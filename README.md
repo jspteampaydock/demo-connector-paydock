@@ -133,6 +133,152 @@ The `PaydockPaymentStatus` field is an enum with the following possible values:
 | `paydock-p-paid`         | Partial paid via Paydock             |
 
 
+### Operations with Custom Fields `PaymentExtensionRequest`
+
+| Key                     | Label                    | Description                                                            |
+|-------------------------|-------------------------|------------------------------------------------------------------------|
+| `getPaymentMethodsRequest` | Get all available payment methods | **Request**: JSON structure with action and fields.<br>**Response**: Payment methods data. |
+| `getVaultTokenRequest`     | Get Vault Token        | **Request**: JSON structure with user details.<br>**Response**: Token data. |
+| `getStandalone3dsTokenRequest` | Get Standalone 3ds Token Request | **Request**: JSON structure with payment and user details.<br>**Response**: Token data. |
+| `makePayment`           | Make payment              | **Request**: JSON structure with order details.<br>**Response**: Payment status. |
+| `makePreCharge`         | Make pre charge           | **Request**: JSON structure with customer and payment data.<br>**Response**: Charge data. |
+| `updatePaymentStatus`   | Update payment status      | **Request**: JSON structure with order ID and new status.<br>**Response**: Update confirmation. |
+
+
+### Examples of Operations with `PaymentExtensionRequest`
+
+####  Get Available Payment Methods
+
+Request:
+```json
+{
+  "custom": {
+    "type": {
+      "typeId": "type",
+      "key": "paydock-components-payment-type"
+    },
+    "fields": {
+      "PaymentExtensionRequest": "{\"action\":\"getPaymentMethodsRequest\",\"request\":{}}"
+    }
+  }
+}
+```
+
+Response:
+```json
+{
+  "custom": {
+    "type": {
+      "typeId": "type",
+      "key": "paydock-components-payment-type"
+    },
+    "fields": {
+      "PaymentExtensionResponse": "{\"sandbox_mode\":\"Yes\",\"payment_methods\":{\"card\":{\"name\":\"paydock-pay-card\",\"type\":\"card\",\"title\":\"Card\",\"card_supported_card_schemes\":[{\"value\":\"ausbc\",\"label\":\"Australian Bank Card\"},{\"value\":\"mastercard\",\"label\":\"MasterCard\"}]}}}"
+    }
+  }
+}
+```
+
+
+
+####  Get Vault Token Request
+
+
+Request:
+```json
+{
+  "custom": {
+    "type": {
+      "typeId": "type",
+      "key": "paydock-components-payment-type"
+    },
+    "fields": {
+      "PaymentExtensionRequest": "{\"action\":\"getVaultTokenRequest\",\"request\":{\"customerId\":\"*******\",\"paymentMethod\":{\"type\":\"card\",\"cardDetails\":{\"number\":\"********\",\"expiryMonth\":\"12\",\"expiryYear\":\"2025\",\"cvv\":\"123\"}}}}"
+    }
+  }
+}
+```
+Response:
+```json
+{
+  "custom": {
+    "type": {
+      "typeId": "type",
+      "key": "paydock-components-payment-type"
+    },
+    "fields": {
+      "PaymentExtensionResponse": "{\"status\":\"Success\",\"vaultToken\":\"vault-token-abc123\"}"
+    }
+  }
+}
+```
+
+####  Make Payment Request
+
+
+Request:
+```json
+{
+  "custom": {
+    "type": {
+      "typeId": "type",
+      "key": "paydock-components-payment-type"
+    },
+    "fields": {
+      "PaymentExtensionRequest": "{\"action\":\"makePayment\",\"request\":{\"amount\":100,\"currency\":\"AUD\",\"reference\":\"order-id-456\",\"vaultToken\":\"vault-token-abc123\"}}"
+    }
+  }
+}
+```
+
+Response:
+```json
+{
+  "custom": {
+    "type": { 
+      "typeId": "type",
+      "key": "paydock-components-payment-type"
+    },
+    "fields": {
+      "PaymentExtensionResponse": "{\"orderPaymentStatus\":\"Paid\",\"orderStatus\":\"Complete\"}"
+    }
+  }
+}
+```
+
+
+####  Update Payment Status
+
+Request:
+```json
+{
+  "custom": {
+    "type": {
+      "typeId": "type",
+      "key": "paydock-components-payment-type"
+    },
+    "fields": {
+      "PaymentExtensionRequest": "{\"action\":\"updatePaymentStatus\",\"request\":{\"orderId\":\"*******\",\"newStatus\":\"paydock-paid\",\"newDate\":\"2024-09-20 12:07:10\"}}"
+    }
+  }
+}
+```
+
+Response:
+```json
+{
+  "custom": {
+    "type": {
+      "typeId": "type",
+      "key": "paydock-components-payment-type"
+    },
+    "fields": {
+      "PaymentExtensionResponse": "{\"status\":true,\"message\":\"Status updated successfully\"}"
+    }
+  }
+}
+```
+
 ## Additional Resources
 
 - [Paydock Commercetools Widget](https://github.com/PayDock/e-commerce-commercetools-npm)

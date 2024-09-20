@@ -4,7 +4,7 @@ import config from '../../config/config.js'
 import {addPaydockLog, getLogActions} from '../../utils/logger.js'
 import ctp from '../../utils/ctp.js'
 import customObjectsUtils from '../../utils/custom-objects-utils.js'
-import {addPaydockHttpLog, callPaydock} from './paydock-api-service.js';
+import {callPaydock} from './paydock-api-service.js';
 
 async function processNotification(
     notificationResponse
@@ -26,7 +26,6 @@ async function processNotification(
             result.status = 'Failure'
             result.message = 'Payment not found'
         } else if (event !== undefined) {
-            addPaydockHttpLog(notificationResponse)
             switch (event) {
                 case 'transaction_success':
                 case 'transaction_failure':
