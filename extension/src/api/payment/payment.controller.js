@@ -25,10 +25,7 @@ async function processRequest(request, response) {
         const authToken = getAuthorizationRequestHeader(request)
         paymentObject = await _getPaymentObject(request)
 
-        const paymentExtensionRequest = paymentObject?.custom?.fields?.PaymentExtensionRequest ?? null;
-        if (paymentExtensionRequest === null) {
-            return httpUtils.sendResponse({response, statusCode: 200, data: {actions: []}})
-        }
+
         const paymentResult = await paymentHandler.handlePaymentByExtRequest(
             paymentObject,
             authToken,
